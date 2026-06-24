@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import LockScreen from './screens/LockScreen'
 import SetupScreen from './screens/SetupScreen'
 import ExercisePreviewScreen from './screens/ExercisePreviewScreen'
 import PlanBuilderScreen from './screens/PlanBuilderScreen'
@@ -12,6 +13,9 @@ import useSavedPlans from './hooks/useSavedPlans'
 const S = { SETUP: 0, PREVIEW: 1, BUILDER: 2, WORKOUT: 3, PAUSE: 4, BURNOUT: 5, DONE: 6 }
 
 export default function App() {
+  const [unlocked, setUnlocked] = useState(
+    () => sessionStorage.getItem('corefit_unlocked') === '1'
+  )
   const [screen, setScreen] = useState(S.SETUP)
   const [config, setConfig] = useState(null)
   const [exercises, setExercises] = useState([])
@@ -112,9 +116,10 @@ export default function App() {
 
   return (
     <div className="bg-white no-select" style={{ height: '100dvh', overflow: 'hidden' }}>
-      {screen >= S.WORKOUT && muteBtn}
+      {!unlocked && <LockScreen onUnlock={() => setUnlocked(true)} />}
+      {unlocked && screen >= S.WORKOUT && muteBtn}
 
-      {screen === S.SETUP && (
+      {unlocked && screen === S.SETUP && (
         <SetupScreen
           onStart={handleSetupDone}
           onOpenBuilder={handleOpenBuilder}
@@ -123,7 +128,7 @@ export default function App() {
           onDeletePlan={deletePlan}
         />
       )}
-      {screen === S.PREVIEW && (
+      {unlocked && screen === S.PREVIEW && (
         <ExercisePreviewScreen
           exercises={exercises}
           selectedLevels={config.selectedLevels}
@@ -132,7 +137,7 @@ export default function App() {
           onSavePlan={handleSavePlanFromPreview}
         />
       )}
-      {screen === S.BUILDER && (
+      {unlocked && screen === S.BUILDER && (
         <PlanBuilderScreen
           selectedLevels={config.selectedLevels}
           config={config}
@@ -140,7 +145,7 @@ export default function App() {
           onBack={() => setScreen(S.SETUP)}
         />
       )}
-      {screen === S.WORKOUT && (
+      {unlocked && screen === S.WORKOUT && (
         <WorkoutScreen
           key={currentExIdx}
           exercise={exercises[currentExIdx]}
@@ -151,7 +156,7 @@ export default function App() {
           onFinish={() => finishExercise(exercises[currentExIdx])}
         />
       )}
-      {screen === S.PAUSE && (
+      {unlocked && screen === S.PAUSE && (
         <PauseScreen
           duration={config.pauseDuration}
           nextExercise={exercises[currentExIdx + 1]}
@@ -160,7 +165,7 @@ export default function App() {
           onResume={resumeAfterPause}
         />
       )}
-      {screen === S.BURNOUT && burnout && (
+      {unlocked && screen === S.BURNOUT && burnout && (
         <BurnoutScreen
           exercise={burnout}
           config={config}
@@ -168,7 +173,7 @@ export default function App() {
           onFinish={() => setScreen(S.DONE)}
         />
       )}
-      {screen === S.DONE && (
+      {unlocked && screen === S.DONE && (
         <DoneScreen
           exercises={completedExercises}
           config={config}
