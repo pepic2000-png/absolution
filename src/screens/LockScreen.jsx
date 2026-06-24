@@ -1,8 +1,9 @@
 import { useState } from 'react'
 
 const PASSWORD = 'PainIsGain!'
+const ADMIN_PASSWORD = 'Absolution#Admin'
 
-export default function LockScreen({ onUnlock }) {
+export default function LockScreen({ onUnlock, onAdminUnlock }) {
   const [input, setInput] = useState('')
   const [error, setError] = useState(false)
   const [shake, setShake] = useState(false)
@@ -10,8 +11,9 @@ export default function LockScreen({ onUnlock }) {
   function handleSubmit(e) {
     e.preventDefault()
     if (input === PASSWORD) {
-      sessionStorage.setItem('corefit_unlocked', '1')
       onUnlock()
+    } else if (input === ADMIN_PASSWORD) {
+      onAdminUnlock(input)
     } else {
       setError(true)
       setShake(true)
@@ -21,8 +23,7 @@ export default function LockScreen({ onUnlock }) {
   }
 
   return (
-    <div
-      className="flex flex-col items-center justify-center bg-white"
+    <div className="flex flex-col items-center justify-center bg-white"
       style={{
         height: '100dvh',
         paddingTop: 'max(24px, env(safe-area-inset-top))',
@@ -35,12 +36,7 @@ export default function LockScreen({ onUnlock }) {
         <p className="text-gray-400 text-sm mb-10">Passwort eingeben</p>
 
         <form onSubmit={handleSubmit}>
-          <div
-            className="mb-4"
-            style={{
-              animation: shake ? 'shake 0.4s ease' : 'none',
-            }}
-          >
+          <div style={{ animation: shake ? 'shake 0.4s ease' : 'none' }} className="mb-4">
             <input
               type="password"
               value={input}
@@ -48,22 +44,12 @@ export default function LockScreen({ onUnlock }) {
               placeholder="Passwort"
               autoFocus
               className="w-full bg-gray-50 border rounded-2xl px-4 py-4 text-center text-lg outline-none transition-colors"
-              style={{
-                borderColor: error ? '#D85A30' : '#e5e5e5',
-                borderWidth: '2px',
-              }}
+              style={{ borderColor: error ? '#D85A30' : '#e5e5e5', borderWidth: '2px' }}
             />
-            {error && (
-              <p className="text-sm mt-2" style={{ color: '#D85A30' }}>
-                Falsches Passwort
-              </p>
-            )}
+            {error && <p className="text-sm mt-2" style={{ color: '#D85A30' }}>Falsches Passwort</p>}
           </div>
-
-          <button
-            type="submit"
-            className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl active:opacity-90"
-          >
+          <button type="submit"
+            className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl active:opacity-90">
             Entsperren
           </button>
         </form>

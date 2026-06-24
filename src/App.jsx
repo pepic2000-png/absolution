@@ -3,18 +3,26 @@ import LockScreen from './screens/LockScreen'
 import SetupScreen from './screens/SetupScreen'
 import ExercisePreviewScreen from './screens/ExercisePreviewScreen'
 import PlanBuilderScreen from './screens/PlanBuilderScreen'
+import AdminScreen from './screens/AdminScreen'
 import WorkoutScreen from './screens/WorkoutScreen'
 import PauseScreen from './screens/PauseScreen'
 import BurnoutScreen from './screens/BurnoutScreen'
 import DoneScreen from './screens/DoneScreen'
 import { selectExercises, selectBurnout, EXERCISES } from './exercises'
 import useSavedPlans from './hooks/useSavedPlans'
+import useSharedPlans from './hooks/useSharedPlans'
+import useExerciseMedia from './hooks/useExerciseMedia'
 
-const S = { SETUP: 0, PREVIEW: 1, BUILDER: 2, WORKOUT: 3, PAUSE: 4, BURNOUT: 5, DONE: 6 }
+const S = { SETUP: 0, PREVIEW: 1, BUILDER: 2, WORKOUT: 3, PAUSE: 4, BURNOUT: 5, DONE: 6, ADMIN: 7 }
+
+const ADMIN_PASSWORD = 'Absolution#Admin'
 
 export default function App() {
   const [unlocked, setUnlocked] = useState(
     () => sessionStorage.getItem('corefit_unlocked') === '1'
+  )
+  const [isAdmin, setIsAdmin] = useState(
+    () => sessionStorage.getItem('corefit_admin') === '1'
   )
   const [screen, setScreen] = useState(S.SETUP)
   const [config, setConfig] = useState(null)
@@ -23,9 +31,20 @@ export default function App() {
   const [currentExIdx, setCurrentExIdx] = useState(0)
   const [muted, setMuted] = useState(false)
   const [completedExercises, setCompletedExercises] = useState([])
-  const { plans, savePlan, deletePlan } = useSavedPlans()
 
-  // Setup → Preview (zufällig)
+  const { plans: localPlans, savePlan, deletePlan } = useSavedPlans()
+  const { sharedPlans, publishPlan, unpublishPlan } = useSharedPlans()
+  const { media, setExerciseMedia, removeExerciseMedia } = useExerciseMedia()
+
+  function handleUnlock(password) {
+    if (password === ADMIN_PASSWORD) {
+      sessionStorage.setItem('corefit_unlocked', '1')
+      sessionStorage.setItem('corefit_admin', '1')
+      setIsAdmin(true)
+      setUnlocked(true)
+    }
+  }
+
   function handleSetupDone(cfg) {
     const exs = selectExercises(cfg.exerciseCount, cfg.selectedLevels)
     const bo = cfg.burnoutEnabled ? selectBurnout(cfg.selectedLevels) : null
@@ -35,14 +54,12 @@ export default function App() {
     setScreen(S.PREVIEW)
   }
 
-  // Setup → Builder (eigener Plan)
   function handleOpenBuilder(cfg) {
     setConfig(cfg)
     setScreen(S.BUILDER)
   }
 
-  // Load saved plan directly to preview
-  function handleLoadPlan(plan) {
+  function handleLoadPlan(plan, isShared = false) {
     const cfg = plan.config
     setConfig(cfg)
     const exs = plan.exercises
@@ -55,28 +72,18 @@ export default function App() {
     setScreen(S.PREVIEW)
   }
 
-  // Builder → Preview
   function handleBuilderConfirm(confirmedExercises, planName) {
-    if (planName) {
-      savePlan(planName, confirmedExercises, config)
-    }
+    if (planName) savePlan(planName, confirmedExercises, config)
     setExercises(confirmedExercises)
-    const bo = config.burnoutEnabled ? selectBurnout(config.selectedLevels) : null
-    setBurnout(bo)
+    setBurnout(config.burnoutEnabled ? selectBurnout(config.selectedLevels) : null)
     setScreen(S.PREVIEW)
   }
 
-  // Preview → Workout
   function handlePreviewConfirm(confirmedExercises) {
     setExercises(confirmedExercises)
     setCurrentExIdx(0)
     setCompletedExercises([])
     setScreen(S.WORKOUT)
-  }
-
-  // Save plan from preview
-  function handleSavePlanFromPreview(name, exs) {
-    savePlan(name, exs, config)
   }
 
   function finishExercise(exercise) {
@@ -104,28 +111,34 @@ export default function App() {
   }
 
   const muteBtn = (
-    <button
-      onClick={() => setMuted(m => !m)}
+    <button onClick={() => setMuted(m => !m)}
       className="fixed z-50 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur border border-gray-200 text-lg shadow-sm"
-      style={{ top: 'max(16px, env(safe-area-inset-top))', right: '16px' }}
-      aria-label={muted ? 'Ton an' : 'Ton aus'}
-    >
+      style={{ top: 'max(16px, env(safe-area-inset-top))', right: '16px' }}>
       {muted ? '🔇' : '🔊'}
     </button>
   )
 
   return (
     <div className="bg-white no-select" style={{ height: '100dvh', overflow: 'hidden' }}>
-      {!unlocked && <LockScreen onUnlock={() => setUnlocked(true)} />}
-      {unlocked && screen >= S.WORKOUT && muteBtn}
+      {!unlocked && (
+        <LockScreen onUnlock={() => {
+          sessionStorage.setItem('corefit_unlocked', '1')
+          setUnlocked(true)
+        }} onAdminUnlock={handleUnlock} />
+      )}
+
+      {unlocked && screen >= S.WORKOUT && screen < S.ADMIN && muteBtn}
 
       {unlocked && screen === S.SETUP && (
         <SetupScreen
           onStart={handleSetupDone}
           onOpenBuilder={handleOpenBuilder}
-          savedPlans={plans}
+          onOpenAdmin={() => setScreen(S.ADMIN)}
+          savedPlans={localPlans}
+          sharedPlans={sharedPlans}
           onLoadPlan={handleLoadPlan}
           onDeletePlan={deletePlan}
+          isAdmin={isAdmin}
         />
       )}
       {unlocked && screen === S.PREVIEW && (
@@ -134,7 +147,7 @@ export default function App() {
           selectedLevels={config.selectedLevels}
           onConfirm={handlePreviewConfirm}
           onBack={() => setScreen(S.SETUP)}
-          onSavePlan={handleSavePlanFromPreview}
+          onSavePlan={(name, exs) => savePlan(name, exs, config)}
         />
       )}
       {unlocked && screen === S.BUILDER && (
@@ -142,6 +155,18 @@ export default function App() {
           selectedLevels={config.selectedLevels}
           config={config}
           onConfirm={handleBuilderConfirm}
+          onBack={() => setScreen(S.SETUP)}
+        />
+      )}
+      {unlocked && screen === S.ADMIN && (
+        <AdminScreen
+          sharedPlans={sharedPlans}
+          onPublishPlan={publishPlan}
+          onUnpublishPlan={unpublishPlan}
+          media={media}
+          onSetMedia={setExerciseMedia}
+          onRemoveMedia={removeExerciseMedia}
+          localPlans={localPlans}
           onBack={() => setScreen(S.SETUP)}
         />
       )}
@@ -153,6 +178,7 @@ export default function App() {
           totalExercises={exercises.length}
           config={config}
           muted={muted}
+          media={media}
           onFinish={() => finishExercise(exercises[currentExIdx])}
         />
       )}

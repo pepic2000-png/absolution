@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import RingTimer from '../components/RingTimer'
 import VariantCards from '../components/VariantCards'
+import VideoModal from '../components/VideoModal'
 import { sounds } from '../audio'
 
 const VARIANT_COLORS = {
@@ -11,11 +12,13 @@ const VARIANT_COLORS = {
 }
 
 export default function WorkoutScreen({
-  exercise, exerciseIndex, totalExercises, config, muted, onFinish
+  exercise, exerciseIndex, totalExercises, config, muted, onFinish, media = {}
 }) {
   const [variantIdx, setVariantIdx] = useState(0)
   const [seconds, setSeconds] = useState(config.variantDuration)
   const [paused, setPaused] = useState(false)
+  const [showVideo, setShowVideo] = useState(false)
+  const exerciseMedia = media[exercise.id]
   const pausedRef = useRef(false)
   const secondsRef = useRef(config.variantDuration)
   const variantIdxRef = useRef(0)
@@ -120,20 +123,30 @@ export default function WorkoutScreen({
 
         {/* Controls */}
         <div className="flex gap-3 mt-auto flex-shrink-0">
-          <button
-            onClick={togglePause}
-            className="flex-1 py-4 rounded-2xl font-semibold text-base bg-gray-100 text-gray-800 active:bg-gray-200"
-          >
+          <button onClick={togglePause}
+            className="flex-1 py-4 rounded-2xl font-semibold text-base bg-gray-100 text-gray-800 active:bg-gray-200">
             {paused ? '▶ Weiter' : '⏸ Pause'}
           </button>
-          <button
-            onClick={skip}
-            className="px-6 py-4 rounded-2xl font-semibold text-base bg-gray-100 text-gray-500 active:bg-gray-200"
-          >
+          {exerciseMedia && (
+            <button onClick={() => { setPaused(true); pausedRef.current = true; setShowVideo(true) }}
+              className="px-4 py-4 rounded-2xl font-semibold text-base bg-gray-100 text-gray-500 active:bg-gray-200">
+              🎬
+            </button>
+          )}
+          <button onClick={skip}
+            className="px-5 py-4 rounded-2xl font-semibold text-base bg-gray-100 text-gray-500 active:bg-gray-200">
             Skip →
           </button>
         </div>
       </div>
+
+      {showVideo && exerciseMedia && (
+        <VideoModal
+          url={exerciseMedia.url}
+          type={exerciseMedia.type}
+          onClose={() => { setShowVideo(false); setPaused(false); pausedRef.current = false }}
+        />
+      )}
     </div>
   )
 }

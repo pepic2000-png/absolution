@@ -42,7 +42,7 @@ function Toggle({ on, onChange }) {
   )
 }
 
-export default function SetupScreen({ onStart, onOpenBuilder, savedPlans, onLoadPlan, onDeletePlan }) {
+export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, savedPlans, sharedPlans = [], onLoadPlan, onDeletePlan, isAdmin }) {
   const [exerciseCount, setExerciseCount] = useState(4)
   const [variantDuration, setVariantDuration] = useState(30)
   const [pauseDuration, setPauseDuration] = useState(15)
@@ -106,20 +106,45 @@ export default function SetupScreen({ onStart, onOpenBuilder, savedPlans, onLoad
           <h1 className="text-2xl font-bold text-gray-900">Core Workout</h1>
           <p className="text-gray-400 text-sm">Workout konfigurieren</p>
         </div>
-        {savedPlans.length > 0 && (
-          <button
-            onClick={() => setShowPlans(s => !s)}
-            className="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-xl active:bg-gray-200 mt-1"
-          >
-            📋 Pläne ({savedPlans.length})
-          </button>
-        )}
+        <div className="flex gap-2 mt-1">
+          {(savedPlans.length > 0 || sharedPlans.length > 0) && (
+            <button onClick={() => setShowPlans(s => !s)}
+              className="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-xl active:bg-gray-200">
+              📋 {savedPlans.length + sharedPlans.length}
+            </button>
+          )}
+          {isAdmin && (
+            <button onClick={onOpenAdmin}
+              className="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-xl active:bg-gray-200">
+              ⚙️
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Saved plans panel */}
-      {showPlans && savedPlans.length > 0 && (
+      {/* Plans panel */}
+      {showPlans && (savedPlans.length > 0 || sharedPlans.length > 0) && (
         <div className="mx-5 mb-3 bg-gray-50 rounded-2xl p-3 flex-shrink-0">
-          <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 font-medium">Gespeicherte Pläne</div>
+          {sharedPlans.length > 0 && (
+            <div className="mb-3">
+              <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 font-medium">🌐 Geteilte Pläne</div>
+              <div className="space-y-2">
+                {sharedPlans.map(plan => (
+                  <div key={plan.id} className="flex items-center gap-2 bg-white rounded-xl px-3 py-2.5">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-gray-800 text-sm truncate">{plan.name}</div>
+                      <div className="text-xs text-gray-400">{plan.exercises?.length} Übungen</div>
+                    </div>
+                    <button onClick={() => handleLoadPlan(plan, true)}
+                      className="text-sm font-semibold text-gray-900 bg-gray-100 px-3 py-1.5 rounded-xl active:bg-gray-200 flex-shrink-0">
+                      Laden
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 font-medium">Meine Pläne</div>
           <div className="space-y-2">
             {savedPlans.map(plan => (
               <div key={plan.id} className="flex items-center gap-2 bg-white rounded-xl px-3 py-2.5">
