@@ -1,70 +1,63 @@
 import { useState } from 'react'
 import SetupScreen from './screens/SetupScreen'
+import ExercisePreviewScreen from './screens/ExercisePreviewScreen'
 import WorkoutScreen from './screens/WorkoutScreen'
 import PauseScreen from './screens/PauseScreen'
 import BurnoutScreen from './screens/BurnoutScreen'
 import DoneScreen from './screens/DoneScreen'
 import { selectExercises, selectBurnout } from './exercises'
 
-const SCREENS = {
-  SETUP: 'setup',
-  WORKOUT: 'workout',
-  PAUSE: 'pause',
-  BURNOUT: 'burnout',
-  DONE: 'done',
-}
-
-function buildWorkout(config) {
-  const exercises = selectExercises(config.exerciseCount, config.variantCount)
-  const burnout = config.burnoutEnabled ? selectBurnout(config.variantCount) : null
-  return { exercises, burnout }
-}
+const S = { SETUP: 0, PREVIEW: 1, WORKOUT: 2, PAUSE: 3, BURNOUT: 4, DONE: 5 }
 
 export default function App() {
-  const [screen, setScreen] = useState(SCREENS.SETUP)
+  const [screen, setScreen] = useState(S.SETUP)
   const [config, setConfig] = useState(null)
-  const [workout, setWorkout] = useState(null)
+  const [exercises, setExercises] = useState([])
+  const [burnout, setBurnout] = useState(null)
   const [currentExIdx, setCurrentExIdx] = useState(0)
   const [muted, setMuted] = useState(false)
   const [completedExercises, setCompletedExercises] = useState([])
 
-  function startWorkout(cfg) {
-    const w = buildWorkout(cfg)
+  // Setup → Preview
+  function handleSetupDone(cfg) {
+    const exs = selectExercises(cfg.exerciseCount, cfg.selectedLevels)
+    const bo = cfg.burnoutEnabled ? selectBurnout(cfg.selectedLevels) : null
     setConfig(cfg)
-    setWorkout(w)
+    setExercises(exs)
+    setBurnout(bo)
+    setScreen(S.PREVIEW)
+  }
+
+  // Preview confirmed (possibly with swapped exercises)
+  function handlePreviewConfirm(confirmedExercises) {
+    setExercises(confirmedExercises)
     setCurrentExIdx(0)
     setCompletedExercises([])
-    setScreen(SCREENS.WORKOUT)
+    setScreen(S.WORKOUT)
   }
 
   function finishExercise(exercise) {
     setCompletedExercises(prev => [...prev, exercise])
-    const isLast = currentExIdx >= workout.exercises.length - 1
+    const isLast = currentExIdx >= exercises.length - 1
     if (isLast) {
-      if (config.burnoutEnabled) {
-        setScreen(SCREENS.BURNOUT)
-      } else {
-        setScreen(SCREENS.DONE)
-      }
+      setScreen(config.burnoutEnabled && burnout ? S.BURNOUT : S.DONE)
     } else {
-      setScreen(SCREENS.PAUSE)
+      setScreen(S.PAUSE)
     }
   }
 
   function resumeAfterPause() {
     setCurrentExIdx(i => i + 1)
-    setScreen(SCREENS.WORKOUT)
-  }
-
-  function finishBurnout() {
-    setScreen(SCREENS.DONE)
+    setScreen(S.WORKOUT)
   }
 
   function reset() {
-    setScreen(SCREENS.SETUP)
-    setWorkout(null)
+    setScreen(S.SETUP)
+    setExercises([])
+    setBurnout(null)
     setConfig(null)
     setCompletedExercises([])
+    setCurrentExIdx(0)
   }
 
   const muteBtn = (
@@ -79,41 +72,49 @@ export default function App() {
   )
 
   return (
-    <div className="min-h-screen bg-white no-select">
-      {screen !== SCREENS.SETUP && muteBtn}
+    <div className="bg-white no-select" style={{ height: '100dvh', overflow: 'hidden' }}>
+      {screen >= S.WORKOUT && muteBtn}
 
-      {screen === SCREENS.SETUP && (
-        <SetupScreen onStart={startWorkout} />
+      {screen === S.SETUP && (
+        <SetupScreen onStart={handleSetupDone} />
       )}
-      {screen === SCREENS.WORKOUT && workout && (
-        <WorkoutScreen
-          key={currentExIdx}
-          exercise={workout.exercises[currentExIdx]}
-          exerciseIndex={currentExIdx}
-          totalExercises={workout.exercises.length}
-          config={config}
-          muted={muted}
-          onFinish={() => finishExercise(workout.exercises[currentExIdx])}
+      {screen === S.PREVIEW && (
+        <ExercisePreviewScreen
+          exercises={exercises}
+          selectedLevels={config.selectedLevels}
+          onConfirm={handlePreviewConfirm}
+          onBack={() => setScreen(S.SETUP)}
         />
       )}
-      {screen === SCREENS.PAUSE && workout && (
+      {screen === S.WORKOUT && (
+        <WorkoutScreen
+          key={currentExIdx}
+          exercise={exercises[currentExIdx]}
+          exerciseIndex={currentExIdx}
+          totalExercises={exercises.length}
+          config={config}
+          muted={muted}
+          onFinish={() => finishExercise(exercises[currentExIdx])}
+        />
+      )}
+      {screen === S.PAUSE && (
         <PauseScreen
           duration={config.pauseDuration}
-          nextExercise={workout.exercises[currentExIdx + 1]}
+          nextExercise={exercises[currentExIdx + 1]}
           config={config}
           muted={muted}
           onResume={resumeAfterPause}
         />
       )}
-      {screen === SCREENS.BURNOUT && workout?.burnout && (
+      {screen === S.BURNOUT && burnout && (
         <BurnoutScreen
-          exercise={workout.burnout}
+          exercise={burnout}
           config={config}
           muted={muted}
-          onFinish={finishBurnout}
+          onFinish={() => setScreen(S.DONE)}
         />
       )}
-      {screen === SCREENS.DONE && (
+      {screen === S.DONE && (
         <DoneScreen
           exercises={completedExercises}
           config={config}

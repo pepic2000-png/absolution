@@ -26,8 +26,7 @@ export default function BurnoutScreen({ exercise, config, muted, onFinish }) {
   const advanceVariant = () => {
     const nextIdx = variantIdxRef.current + 1
     if (nextIdx >= variants.length || doneRef.current) {
-      doneRef.current = true
-      onFinish()
+      if (!doneRef.current) { doneRef.current = true; onFinish() }
       return
     }
     variantIdxRef.current = nextIdx
@@ -61,57 +60,50 @@ export default function BurnoutScreen({ exercise, config, muted, onFinish }) {
 
   return (
     <div
-      className="min-h-screen flex flex-col screen-enter"
+      className="flex flex-col screen-enter"
       style={{
-        paddingTop: 'max(16px, env(safe-area-inset-top))',
-        paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
+        height: '100dvh',
+        paddingTop: 'max(14px, env(safe-area-inset-top))',
+        paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
         background: 'linear-gradient(180deg, #fff5f2 0%, #fff 60%)',
       }}
     >
-      {/* Burnout badge */}
-      <div className="flex justify-center mb-3 mt-2">
+      {/* Badge */}
+      <div className="flex justify-center mb-2 mt-1 flex-shrink-0">
         <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-4 py-1.5">
-          <span className="text-lg">🔥</span>
+          <span className="text-base">🔥</span>
           <span className="text-sm font-bold text-red-600 uppercase tracking-wide">Burnout-Finisher</span>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col px-5 max-w-lg mx-auto w-full">
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">{exercise.name}</h1>
-          <p className="text-sm text-gray-500 mt-1">{exercise.concept}</p>
+      <div className="flex-1 flex flex-col px-5 min-h-0">
+        <div className="flex-shrink-0 mb-2">
+          <h1 className="text-xl font-bold text-gray-900">{exercise.name}</h1>
+          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{exercise.concept}</p>
         </div>
 
-        <VariantCards variants={variants} activeIndex={variantIdx} />
-
-        <div className="flex flex-col items-center my-6">
-          <RingTimer
-            seconds={seconds}
-            total={config.burnoutDuration}
-            level={currentVariant?.level}
-          />
+        <div className="flex-shrink-0 mb-3">
+          <VariantCards variants={variants} activeIndex={variantIdx} />
         </div>
 
-        <div className="text-center mb-4">
-          <div className="text-base font-semibold text-gray-800">{currentVariant?.name}</div>
-          <div className="text-sm text-gray-500 mt-1">{currentVariant?.desc}</div>
+        <div className="flex justify-center flex-shrink-0 mb-2">
+          <RingTimer seconds={seconds} total={config.burnoutDuration} level={currentVariant?.level} />
         </div>
 
-        <div className="rounded-xl px-4 py-3 text-sm font-bold text-center mb-6 bg-red-50 text-red-600">
+        <div className="text-center flex-shrink-0 mb-2">
+          <div className="text-sm font-semibold text-gray-800">{currentVariant?.name}</div>
+          <div className="text-xs text-gray-500 mt-0.5 line-clamp-2">{currentVariant?.desc}</div>
+        </div>
+
+        <div className="rounded-xl px-4 py-2.5 text-sm font-bold text-center flex-shrink-0 mb-3 bg-red-50 text-red-600 line-clamp-2">
           🔥 {currentVariant?.cue}
         </div>
 
-        <div className="flex gap-3 mt-auto">
-          <button
-            onClick={togglePause}
-            className="flex-1 py-4 rounded-2xl font-semibold text-base bg-gray-100 text-gray-800 active:bg-gray-200"
-          >
+        <div className="flex gap-3 mt-auto flex-shrink-0">
+          <button onClick={togglePause} className="flex-1 py-4 rounded-2xl font-semibold text-base bg-gray-100 text-gray-800 active:bg-gray-200">
             {paused ? '▶ Weiter' : '⏸ Pause'}
           </button>
-          <button
-            onClick={skip}
-            className="px-6 py-4 rounded-2xl font-semibold text-base bg-gray-100 text-gray-500 active:bg-gray-200"
-          >
+          <button onClick={skip} className="px-6 py-4 rounded-2xl font-semibold text-base bg-gray-100 text-gray-500 active:bg-gray-200">
             Skip →
           </button>
         </div>

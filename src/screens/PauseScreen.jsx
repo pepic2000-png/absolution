@@ -28,25 +28,23 @@ export default function PauseScreen({ duration, nextExercise, config, muted, onR
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center px-5 screen-enter"
+      className="flex flex-col items-center justify-center px-5 screen-enter"
       style={{
+        height: '100dvh',
         paddingTop: 'max(24px, env(safe-area-inset-top))',
         paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
       }}
     >
       <div className="max-w-lg w-full text-center">
-        <div className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-4">Pause</div>
+        <div className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">Pause</div>
+        <div className="text-8xl font-bold text-gray-900 tabular-nums mb-1">{seconds}</div>
+        <div className="text-gray-400 text-sm mb-8">Sekunden bis zur nächsten Übung</div>
 
-        {/* Big countdown */}
-        <div className="text-8xl font-bold text-gray-900 tabular-nums mb-2">{seconds}</div>
-        <div className="text-gray-400 text-sm mb-10">Sekunden bis zur nächsten Übung</div>
-
-        {/* Next exercise preview */}
         {nextExercise && (
-          <div className="bg-gray-50 rounded-2xl p-5 text-left mb-8">
+          <div className="bg-gray-50 rounded-2xl p-5 text-left mb-6">
             <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">Nächste Übung</div>
             <div className="text-xl font-bold text-gray-900 mb-1">{nextExercise.name}</div>
-            <div className="text-sm text-gray-500 mb-3">{nextExercise.concept}</div>
+            <div className="text-sm text-gray-500 mb-3 line-clamp-2">{nextExercise.concept}</div>
             <div className="flex gap-2 text-xs text-gray-500">
               <span className="bg-white rounded-lg px-3 py-1.5 border border-gray-200">
                 {variants.length} Variante{variants.length !== 1 ? 'n' : ''}

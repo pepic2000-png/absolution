@@ -618,8 +618,12 @@ function shuffle(arr) {
   return a
 }
 
+// All level keys in order
+export const ALL_LEVELS = ['easy', 'medium', 'hard', 'maximum']
+
 // Select exercises: start with activation, then mix patterns
-export function selectExercises(count, variantCount) {
+// levels = array of level keys to include, e.g. ['hard', 'maximum']
+export function selectExercises(count, levels = ALL_LEVELS) {
   const activation = EXERCISES.find(e => e.id === 'dead-bug')
   const rest = EXERCISES.filter(e => e.id !== 'dead-bug')
   const shuffled = shuffle(rest)
@@ -643,14 +647,19 @@ export function selectExercises(count, variantCount) {
     }
   }
 
-  // Trim variants to variantCount
+  // Filter variants to selected levels (preserve order)
   return selected.slice(0, count).map(ex => ({
     ...ex,
-    variants: ex.variants.slice(0, variantCount),
+    variants: ex.variants.filter(v => levels.includes(v.level)),
   }))
 }
 
-export function selectBurnout(variantCount) {
+export function selectBurnout(levels = ALL_LEVELS) {
   const picked = shuffle(BURNOUT_EXERCISES)[0]
-  return { ...picked, variants: picked.variants.slice(0, variantCount) }
+  return { ...picked, variants: picked.variants.filter(v => levels.includes(v.level)) }
+}
+
+// Return exercises not in excludeIds (for swapping in preview)
+export function getSwapCandidates(excludeIds) {
+  return EXERCISES.filter(e => !excludeIds.includes(e.id))
 }
