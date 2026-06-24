@@ -19,10 +19,10 @@ const ADMIN_PASSWORD = 'Absolution#Admin'
 
 export default function App() {
   const [unlocked, setUnlocked] = useState(
-    () => sessionStorage.getItem('corefit_unlocked') === '1'
+    () => localStorage.getItem('corefit_unlocked') === '1'
   )
   const [isAdmin, setIsAdmin] = useState(
-    () => sessionStorage.getItem('corefit_admin') === '1'
+    () => localStorage.getItem('corefit_admin') === '1'
   )
   const [screen, setScreen] = useState(S.SETUP)
   const [config, setConfig] = useState(null)
@@ -38,11 +38,25 @@ export default function App() {
 
   function handleUnlock(password) {
     if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem('corefit_unlocked', '1')
-      sessionStorage.setItem('corefit_admin', '1')
+      localStorage.setItem('corefit_unlocked', '1')
+      localStorage.setItem('corefit_admin', '1')
       setIsAdmin(true)
       setUnlocked(true)
     }
+  }
+
+  function handleAdminSwitch(password) {
+    if (password === ADMIN_PASSWORD) {
+      localStorage.setItem('corefit_admin', '1')
+      setIsAdmin(true)
+      return true
+    }
+    return false
+  }
+
+  function handleAdminLogout() {
+    localStorage.removeItem('corefit_admin')
+    setIsAdmin(false)
   }
 
   function handleSetupDone(cfg) {
@@ -122,7 +136,7 @@ export default function App() {
     <div className="bg-white no-select" style={{ height: '100dvh', overflow: 'hidden' }}>
       {!unlocked && (
         <LockScreen onUnlock={() => {
-          sessionStorage.setItem('corefit_unlocked', '1')
+          localStorage.setItem('corefit_unlocked', '1')
           setUnlocked(true)
         }} onAdminUnlock={handleUnlock} />
       )}
@@ -139,6 +153,8 @@ export default function App() {
           onLoadPlan={handleLoadPlan}
           onDeletePlan={deletePlan}
           isAdmin={isAdmin}
+          onAdminSwitch={handleAdminSwitch}
+          onAdminLogout={handleAdminLogout}
         />
       )}
       {unlocked && screen === S.PREVIEW && (

@@ -42,7 +42,7 @@ function Toggle({ on, onChange }) {
   )
 }
 
-export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, savedPlans, sharedPlans = [], onLoadPlan, onDeletePlan, isAdmin }) {
+export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, savedPlans, sharedPlans = [], onLoadPlan, onDeletePlan, isAdmin, onAdminSwitch, onAdminLogout }) {
   const [exerciseCount, setExerciseCount] = useState(4)
   const [variantDuration, setVariantDuration] = useState(30)
   const [pauseDuration, setPauseDuration] = useState(15)
@@ -51,6 +51,9 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
   const [selectedLevels, setSelectedLevels] = useState(['easy', 'medium', 'hard'])
   const [vol, setVol] = useState(getVolume())
   const [showPlans, setShowPlans] = useState(false)
+  const [showAdminModal, setShowAdminModal] = useState(false)
+  const [adminInput, setAdminInput] = useState('')
+  const [adminError, setAdminError] = useState(false)
 
   function toggleLevel(key) {
     setSelectedLevels(prev => {
@@ -90,6 +93,19 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
     unlockAudio()
     onLoadPlan(plan)
     setShowPlans(false)
+  }
+
+  function handleAdminLogin(e) {
+    e.preventDefault()
+    const ok = onAdminSwitch(adminInput)
+    if (ok) {
+      setShowAdminModal(false)
+      setAdminInput('')
+      setAdminError(false)
+    } else {
+      setAdminError(true)
+      setAdminInput('')
+    }
   }
 
   return (
@@ -263,20 +279,58 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
 
       {/* CTAs */}
       <div className="px-5 pt-3 flex flex-col gap-2 flex-shrink-0">
-        <button
-          onClick={handleStart}
-          disabled={selectedLevels.length === 0}
-          className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl active:opacity-90 disabled:opacity-40"
-        >
+        <button onClick={handleStart} disabled={selectedLevels.length === 0}
+          className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl active:opacity-90 disabled:opacity-40">
           Zufälliges Workout →
         </button>
-        <button
-          onClick={() => { unlockAudio(); onOpenBuilder(currentConfig()) }}
-          className="w-full bg-white text-gray-800 font-semibold text-base py-3.5 rounded-2xl active:bg-gray-50 border border-gray-200"
-        >
+        <button onClick={() => { unlockAudio(); onOpenBuilder(currentConfig()) }}
+          className="w-full bg-white text-gray-800 font-semibold text-base py-3.5 rounded-2xl active:bg-gray-50 border border-gray-200">
           ✏️ Eigenen Plan erstellen
         </button>
+        <div className="flex justify-center pt-1 pb-1">
+          {isAdmin ? (
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-green-600 font-medium">⚙️ Admin-Modus aktiv</span>
+              <button onClick={onAdminLogout} className="text-xs text-gray-400 underline">Abmelden</button>
+            </div>
+          ) : (
+            <button onClick={() => setShowAdminModal(true)} className="text-xs text-gray-400 active:text-gray-600">
+              Als Admin anmelden
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Admin login modal */}
+      {showAdminModal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
+          onClick={() => { setShowAdminModal(false); setAdminInput(''); setAdminError(false) }}>
+          <div className="bg-white w-full max-w-lg rounded-t-3xl p-6 pb-10"
+            style={{ paddingBottom: 'max(40px, env(safe-area-inset-bottom))' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="text-center mb-4">
+              <div className="text-2xl mb-1">⚙️</div>
+              <div className="font-bold text-gray-900">Admin-Passwort</div>
+            </div>
+            <form onSubmit={handleAdminLogin} className="space-y-3">
+              <input
+                type="password"
+                value={adminInput}
+                onChange={e => { setAdminInput(e.target.value); setAdminError(false) }}
+                placeholder="Admin-Passwort"
+                autoFocus
+                className="w-full bg-gray-50 border-2 rounded-2xl px-4 py-3 text-center text-base outline-none"
+                style={{ borderColor: adminError ? '#D85A30' : '#e5e5e5' }}
+              />
+              {adminError && <p className="text-sm text-center" style={{ color: '#D85A30' }}>Falsches Passwort</p>}
+              <button type="submit"
+                className="w-full bg-gray-900 text-white font-bold py-3.5 rounded-2xl active:opacity-90">
+                Anmelden
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
