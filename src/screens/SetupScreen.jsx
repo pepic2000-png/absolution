@@ -19,15 +19,11 @@ function formatTime(seconds) {
 function Stepper({ value, min, max, onChange }) {
   return (
     <div className="flex items-center gap-3">
-      <button
-        onClick={() => onChange(Math.max(min, value - 1))}
-        className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-xl font-bold text-gray-700 active:bg-gray-200 select-none"
-      >−</button>
+      <button onClick={() => onChange(Math.max(min, value - 1))}
+        className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-xl font-bold text-gray-700 active:bg-gray-200 select-none">−</button>
       <span className="w-7 text-center font-bold text-xl text-gray-900 tabular-nums">{value}</span>
-      <button
-        onClick={() => onChange(Math.min(max, value + 1))}
-        className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-xl font-bold text-gray-700 active:bg-gray-200 select-none"
-      >+</button>
+      <button onClick={() => onChange(Math.min(max, value + 1))}
+        className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-xl font-bold text-gray-700 active:bg-gray-200 select-none">+</button>
     </div>
   )
 }
@@ -36,20 +32,17 @@ function Toggle({ on, onChange }) {
   return (
     <button
       onClick={() => onChange(!on)}
-      role="switch"
-      aria-checked={on}
-      className="relative flex-shrink-0 w-12 h-7 rounded-full transition-colors duration-200 focus:outline-none"
-      style={{ backgroundColor: on ? '#f97316' : '#d1d5db' }}
+      role="switch" aria-checked={on}
+      className="relative flex-shrink-0 w-12 h-7 rounded-full focus:outline-none"
+      style={{ backgroundColor: on ? '#f97316' : '#d1d5db', transition: 'background-color 0.2s' }}
     >
-      <span
-        className="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform duration-200"
-        style={{ transform: on ? 'translateX(20px)' : 'translateX(0)' }}
-      />
+      <span className="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow"
+        style={{ transform: on ? 'translateX(20px)' : 'translateX(0)', transition: 'transform 0.2s' }} />
     </button>
   )
 }
 
-export default function SetupScreen({ onStart }) {
+export default function SetupScreen({ onStart, onOpenBuilder, savedPlans, onLoadPlan, onDeletePlan }) {
   const [exerciseCount, setExerciseCount] = useState(4)
   const [variantDuration, setVariantDuration] = useState(30)
   const [pauseDuration, setPauseDuration] = useState(15)
@@ -57,11 +50,12 @@ export default function SetupScreen({ onStart }) {
   const [burnoutDuration, setBurnoutDuration] = useState(60)
   const [selectedLevels, setSelectedLevels] = useState(['easy', 'medium', 'hard'])
   const [vol, setVol] = useState(getVolume())
+  const [showPlans, setShowPlans] = useState(false)
 
   function toggleLevel(key) {
     setSelectedLevels(prev => {
       if (prev.includes(key)) {
-        if (prev.length <= 1) return prev // at least 1
+        if (prev.length <= 1) return prev
         return prev.filter(k => k !== key)
       }
       return [...prev, key]
@@ -83,21 +77,23 @@ export default function SetupScreen({ onStart }) {
     return { total, sets: exerciseCount * variantCount }
   }, [exerciseCount, variantCount, variantDuration, pauseDuration, burnoutEnabled, burnoutDuration])
 
+  function currentConfig() {
+    return { exerciseCount, variantDuration, pauseDuration, burnoutEnabled, burnoutDuration, selectedLevels }
+  }
+
   function handleStart() {
     unlockAudio()
-    onStart({
-      exerciseCount,
-      variantDuration,
-      pauseDuration,
-      burnoutEnabled,
-      burnoutDuration,
-      selectedLevels,
-    })
+    onStart(currentConfig())
+  }
+
+  function handleLoadPlan(plan) {
+    unlockAudio()
+    onLoadPlan(plan)
+    setShowPlans(false)
   }
 
   return (
-    <div
-      className="flex flex-col bg-white screen-enter"
+    <div className="flex flex-col bg-white screen-enter"
       style={{
         height: '100dvh',
         paddingTop: 'max(20px, env(safe-area-inset-top))',
@@ -105,40 +101,68 @@ export default function SetupScreen({ onStart }) {
       }}
     >
       {/* Header */}
-      <div className="px-5 mb-4">
-        <h1 className="text-2xl font-bold text-gray-900">Core Workout</h1>
-        <p className="text-gray-400 text-sm">Workout konfigurieren</p>
+      <div className="px-5 mb-3 flex-shrink-0 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Core Workout</h1>
+          <p className="text-gray-400 text-sm">Workout konfigurieren</p>
+        </div>
+        {savedPlans.length > 0 && (
+          <button
+            onClick={() => setShowPlans(s => !s)}
+            className="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-xl active:bg-gray-200 mt-1"
+          >
+            📋 Pläne ({savedPlans.length})
+          </button>
+        )}
       </div>
 
-      {/* Scrollable content */}
+      {/* Saved plans panel */}
+      {showPlans && savedPlans.length > 0 && (
+        <div className="mx-5 mb-3 bg-gray-50 rounded-2xl p-3 flex-shrink-0">
+          <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 font-medium">Gespeicherte Pläne</div>
+          <div className="space-y-2">
+            {savedPlans.map(plan => (
+              <div key={plan.id} className="flex items-center gap-2 bg-white rounded-xl px-3 py-2.5">
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-gray-800 text-sm truncate">{plan.name}</div>
+                  <div className="text-xs text-gray-400">{plan.exercises.length} Übungen · {plan.savedAt}</div>
+                </div>
+                <button onClick={() => handleLoadPlan(plan)}
+                  className="text-sm font-semibold text-gray-900 bg-gray-100 px-3 py-1.5 rounded-xl active:bg-gray-200 flex-shrink-0">
+                  Laden
+                </button>
+                <button onClick={() => onDeletePlan(plan.id)}
+                  className="text-red-400 text-lg w-7 flex items-center justify-center flex-shrink-0">✕</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Scrollable config */}
       <div className="flex-1 overflow-y-auto px-5 space-y-5 pb-2">
 
-        {/* Exercise count */}
         <div className="flex items-center justify-between">
           <div>
             <div className="font-semibold text-gray-800">Übungen</div>
-            <div className="text-xs text-gray-400">2 – 15</div>
+            <div className="text-xs text-gray-400">2 – 15 (zufällig)</div>
           </div>
           <Stepper value={exerciseCount} min={2} max={15} onChange={setExerciseCount} />
         </div>
 
-        {/* Level selection */}
         <div>
           <div className="font-semibold text-gray-800 mb-2">Schwierigkeits-Level</div>
           <div className="grid grid-cols-4 gap-2">
             {LEVELS.map(l => {
               const active = selectedLevels.includes(l.key)
               return (
-                <button
-                  key={l.key}
-                  onClick={() => toggleLevel(l.key)}
+                <button key={l.key} onClick={() => toggleLevel(l.key)}
                   className="py-2 rounded-xl text-sm font-semibold transition-all active:scale-95"
                   style={{
                     backgroundColor: active ? l.bg : '#f5f5f5',
                     color: active ? l.color : '#aaa',
                     border: `2px solid ${active ? l.color : 'transparent'}`,
-                  }}
-                >
+                  }}>
                   {l.label}
                 </button>
               )
@@ -147,31 +171,26 @@ export default function SetupScreen({ onStart }) {
           <div className="text-xs text-gray-400 mt-1.5">{variantCount} Variante{variantCount !== 1 ? 'n' : ''} pro Übung</div>
         </div>
 
-        {/* Variant duration */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="font-semibold text-gray-800">Sekunden pro Variante</span>
             <span className="font-bold text-gray-900">{variantDuration}s</span>
           </div>
           <input type="range" min={15} max={60} step={5} value={variantDuration}
-            onChange={e => setVariantDuration(+e.target.value)}
-            className="w-full h-2 accent-gray-800" />
+            onChange={e => setVariantDuration(+e.target.value)} className="w-full h-2 accent-gray-800" />
           <div className="flex justify-between text-xs text-gray-400 mt-1"><span>15s</span><span>60s</span></div>
         </div>
 
-        {/* Pause */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="font-semibold text-gray-800">Pause zwischen Übungen</span>
             <span className="font-bold text-gray-900">{pauseDuration}s</span>
           </div>
           <input type="range" min={5} max={30} step={5} value={pauseDuration}
-            onChange={e => setPauseDuration(+e.target.value)}
-            className="w-full h-2 accent-gray-800" />
+            onChange={e => setPauseDuration(+e.target.value)} className="w-full h-2 accent-gray-800" />
           <div className="flex justify-between text-xs text-gray-400 mt-1"><span>5s</span><span>30s</span></div>
         </div>
 
-        {/* Burnout */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -187,26 +206,22 @@ export default function SetupScreen({ onStart }) {
                 <span className="font-bold text-orange-700">{burnoutDuration}s</span>
               </div>
               <input type="range" min={30} max={120} step={10} value={burnoutDuration}
-                onChange={e => setBurnoutDuration(+e.target.value)}
-                className="w-full h-2 accent-orange-500" />
+                onChange={e => setBurnoutDuration(+e.target.value)} className="w-full h-2 accent-orange-500" />
               <div className="flex justify-between text-xs text-orange-400 mt-1"><span>30s</span><span>120s</span></div>
             </div>
           )}
         </div>
 
-        {/* Volume */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="font-semibold text-gray-800">🔊 Lautstärke</span>
             <span className="text-sm text-gray-500">{Math.round(vol * 100)}%</span>
           </div>
           <input type="range" min={0} max={1} step={0.05} value={vol}
-            onChange={e => handleVolumeChange(+e.target.value)}
-            className="w-full h-2 accent-gray-800" />
+            onChange={e => handleVolumeChange(+e.target.value)} className="w-full h-2 accent-gray-800" />
           <div className="flex justify-between text-xs text-gray-400 mt-1"><span>Aus</span><span>Voll</span></div>
         </div>
 
-        {/* Summary */}
         <div className="bg-gray-50 rounded-2xl p-4">
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white rounded-xl p-3">
@@ -221,14 +236,20 @@ export default function SetupScreen({ onStart }) {
         </div>
       </div>
 
-      {/* CTA */}
-      <div className="px-5 pt-3">
+      {/* CTAs */}
+      <div className="px-5 pt-3 flex flex-col gap-2 flex-shrink-0">
         <button
           onClick={handleStart}
           disabled={selectedLevels.length === 0}
           className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl active:opacity-90 disabled:opacity-40"
         >
-          Übungen ansehen →
+          Zufälliges Workout →
+        </button>
+        <button
+          onClick={() => { unlockAudio(); onOpenBuilder(currentConfig()) }}
+          className="w-full bg-white text-gray-800 font-semibold text-base py-3.5 rounded-2xl active:bg-gray-50 border border-gray-200"
+        >
+          ✏️ Eigenen Plan erstellen
         </button>
       </div>
     </div>

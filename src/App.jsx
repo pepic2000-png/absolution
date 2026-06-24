@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import SetupScreen from './screens/SetupScreen'
 import ExercisePreviewScreen from './screens/ExercisePreviewScreen'
+import PlanBuilderScreen from './screens/PlanBuilderScreen'
 import WorkoutScreen from './screens/WorkoutScreen'
 import PauseScreen from './screens/PauseScreen'
 import BurnoutScreen from './screens/BurnoutScreen'
 import DoneScreen from './screens/DoneScreen'
-import { selectExercises, selectBurnout } from './exercises'
+import { selectExercises, selectBurnout, EXERCISES } from './exercises'
+import useSavedPlans from './hooks/useSavedPlans'
 
-const S = { SETUP: 0, PREVIEW: 1, WORKOUT: 2, PAUSE: 3, BURNOUT: 4, DONE: 5 }
+const S = { SETUP: 0, PREVIEW: 1, BUILDER: 2, WORKOUT: 3, PAUSE: 4, BURNOUT: 5, DONE: 6 }
 
 export default function App() {
   const [screen, setScreen] = useState(S.SETUP)
@@ -17,8 +19,9 @@ export default function App() {
   const [currentExIdx, setCurrentExIdx] = useState(0)
   const [muted, setMuted] = useState(false)
   const [completedExercises, setCompletedExercises] = useState([])
+  const { plans, savePlan, deletePlan } = useSavedPlans()
 
-  // Setup → Preview
+  // Setup → Preview (zufällig)
   function handleSetupDone(cfg) {
     const exs = selectExercises(cfg.exerciseCount, cfg.selectedLevels)
     const bo = cfg.burnoutEnabled ? selectBurnout(cfg.selectedLevels) : null
@@ -28,12 +31,48 @@ export default function App() {
     setScreen(S.PREVIEW)
   }
 
-  // Preview confirmed (possibly with swapped exercises)
+  // Setup → Builder (eigener Plan)
+  function handleOpenBuilder(cfg) {
+    setConfig(cfg)
+    setScreen(S.BUILDER)
+  }
+
+  // Load saved plan directly to preview
+  function handleLoadPlan(plan) {
+    const cfg = plan.config
+    setConfig(cfg)
+    const exs = plan.exercises
+      .map(id => EXERCISES.find(e => e.id === id))
+      .filter(Boolean)
+      .map(ex => ({ ...ex, variants: ex.variants.filter(v => cfg.selectedLevels.includes(v.level)) }))
+    const bo = cfg.burnoutEnabled ? selectBurnout(cfg.selectedLevels) : null
+    setExercises(exs)
+    setBurnout(bo)
+    setScreen(S.PREVIEW)
+  }
+
+  // Builder → Preview
+  function handleBuilderConfirm(confirmedExercises, planName) {
+    if (planName) {
+      savePlan(planName, confirmedExercises, config)
+    }
+    setExercises(confirmedExercises)
+    const bo = config.burnoutEnabled ? selectBurnout(config.selectedLevels) : null
+    setBurnout(bo)
+    setScreen(S.PREVIEW)
+  }
+
+  // Preview → Workout
   function handlePreviewConfirm(confirmedExercises) {
     setExercises(confirmedExercises)
     setCurrentExIdx(0)
     setCompletedExercises([])
     setScreen(S.WORKOUT)
+  }
+
+  // Save plan from preview
+  function handleSavePlanFromPreview(name, exs) {
+    savePlan(name, exs, config)
   }
 
   function finishExercise(exercise) {
@@ -76,13 +115,28 @@ export default function App() {
       {screen >= S.WORKOUT && muteBtn}
 
       {screen === S.SETUP && (
-        <SetupScreen onStart={handleSetupDone} />
+        <SetupScreen
+          onStart={handleSetupDone}
+          onOpenBuilder={handleOpenBuilder}
+          savedPlans={plans}
+          onLoadPlan={handleLoadPlan}
+          onDeletePlan={deletePlan}
+        />
       )}
       {screen === S.PREVIEW && (
         <ExercisePreviewScreen
           exercises={exercises}
           selectedLevels={config.selectedLevels}
           onConfirm={handlePreviewConfirm}
+          onBack={() => setScreen(S.SETUP)}
+          onSavePlan={handleSavePlanFromPreview}
+        />
+      )}
+      {screen === S.BUILDER && (
+        <PlanBuilderScreen
+          selectedLevels={config.selectedLevels}
+          config={config}
+          onConfirm={handleBuilderConfirm}
           onBack={() => setScreen(S.SETUP)}
         />
       )}
