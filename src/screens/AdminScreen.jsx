@@ -1,14 +1,21 @@
 import { useState } from 'react'
 import { EXERCISES } from '../exercises'
+import ExerciseForm from '../components/ExerciseForm'
 
-export default function AdminScreen({ sharedPlans, onPublishPlan, onUnpublishPlan, media, onSetMedia, onRemoveMedia, localPlans, onBack }) {
-  const [tab, setTab] = useState('plans') // 'plans' | 'videos'
-  const [publishing, setPublishing] = useState(null) // local plan being published
+export default function AdminScreen({
+  sharedPlans, onPublishPlan, onUnpublishPlan,
+  media, onSetMedia, onRemoveMedia,
+  localPlans, onBack,
+  globalExercises, onAddGlobalExercise, onRemoveGlobalExercise,
+}) {
+  const [tab, setTab] = useState('plans') // 'plans' | 'videos' | 'exercises'
+  const [publishing, setPublishing] = useState(null)
   const [publishName, setPublishName] = useState('')
-  const [editingMedia, setEditingMedia] = useState(null) // exerciseId
+  const [editingMedia, setEditingMedia] = useState(null)
   const [mediaUrl, setMediaUrl] = useState('')
   const [mediaType, setMediaType] = useState('youtube')
   const [saving, setSaving] = useState(false)
+  const [showExerciseForm, setShowExerciseForm] = useState(false)
 
   async function handlePublish(plan) {
     if (!publishName.trim()) return
@@ -28,10 +35,19 @@ export default function AdminScreen({ sharedPlans, onPublishPlan, onUnpublishPla
     setMediaUrl('')
   }
 
+  async function handleAddGlobalExercise(exercise) {
+    setSaving(true)
+    await onAddGlobalExercise(exercise)
+    setSaving(false)
+    setShowExerciseForm(false)
+  }
+
   function getYouTubeId(url) {
     const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)
     return m ? m[1] : null
   }
+
+  const allExercisesForVideo = [...EXERCISES, ...(globalExercises || [])]
 
   return (
     <div className="flex flex-col bg-white screen-enter"
@@ -46,17 +62,21 @@ export default function AdminScreen({ sharedPlans, onPublishPlan, onUnpublishPla
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 active:bg-gray-200">←</button>
         <div>
           <h1 className="text-xl font-bold text-gray-900">Admin</h1>
-          <p className="text-xs text-gray-400">Pläne & Videos verwalten</p>
+          <p className="text-xs text-gray-400">Pläne, Videos & Übungen verwalten</p>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="px-5 mb-4 flex gap-2 flex-shrink-0">
-        {['plans', 'videos'].map(t => (
-          <button key={t} onClick={() => setTab(t)}
-            className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors"
-            style={{ backgroundColor: tab === t ? '#111' : '#f5f5f5', color: tab === t ? '#fff' : '#666' }}>
-            {t === 'plans' ? '📋 Pläne teilen' : '🎬 Videos'}
+        {[
+          { key: 'plans', label: '📋 Pläne' },
+          { key: 'videos', label: '🎬 Videos' },
+          { key: 'exercises', label: '💪 Übungen' },
+        ].map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)}
+            className="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-colors"
+            style={{ backgroundColor: tab === t.key ? '#111' : '#f5f5f5', color: tab === t.key ? '#fff' : '#666' }}>
+            {t.label}
           </button>
         ))}
       </div>
@@ -66,7 +86,6 @@ export default function AdminScreen({ sharedPlans, onPublishPlan, onUnpublishPla
         {/* PLANS TAB */}
         {tab === 'plans' && (
           <div className="space-y-4">
-            {/* Published plans */}
             {sharedPlans.length > 0 && (
               <div>
                 <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 font-medium">Geteilte Pläne</div>
@@ -88,7 +107,6 @@ export default function AdminScreen({ sharedPlans, onPublishPlan, onUnpublishPla
               </div>
             )}
 
-            {/* Local plans to publish */}
             <div>
               <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 font-medium">Lokale Pläne veröffentlichen</div>
               {localPlans.length === 0 && (
@@ -131,8 +149,8 @@ export default function AdminScreen({ sharedPlans, onPublishPlan, onUnpublishPla
         {/* VIDEOS TAB */}
         {tab === 'videos' && (
           <div className="space-y-2">
-            <p className="text-xs text-gray-400 mb-3">YouTube-Link pro Übung eintragen. Alle Nutzer sehen das Video.</p>
-            {EXERCISES.map(ex => {
+            <p className="text-xs text-gray-400 mb-3">YouTube-Link pro Übung. Alle Nutzer sehen das Video.</p>
+            {allExercisesForVideo.map(ex => {
               const m = media[ex.id]
               const isEditing = editingMedia === ex.id
               return (
@@ -188,6 +206,65 @@ export default function AdminScreen({ sharedPlans, onPublishPlan, onUnpublishPla
                 </div>
               )
             })}
+          </div>
+        )}
+
+        {/* EXERCISES TAB */}
+        {tab === 'exercises' && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-xs text-gray-400 uppercase tracking-wider font-medium">Globale Übungen ({(globalExercises || []).length})</div>
+              {!showExerciseForm && (
+                <button onClick={() => setShowExerciseForm(true)}
+                  className="text-sm font-semibold text-gray-900 bg-gray-100 px-3 py-1.5 rounded-xl active:bg-gray-200">
+                  + Neue Übung
+                </button>
+              )}
+            </div>
+
+            {showExerciseForm && (
+              <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+                <div className="font-semibold text-gray-800 mb-3">Neue globale Übung</div>
+                <ExerciseForm
+                  onSave={handleAddGlobalExercise}
+                  onCancel={() => setShowExerciseForm(false)}
+                  submitLabel={saving ? 'Speichern...' : 'Global speichern 🌐'}
+                />
+              </div>
+            )}
+
+            {(globalExercises || []).length === 0 && !showExerciseForm && (
+              <p className="text-sm text-gray-400 text-center py-6">Noch keine globalen Übungen hinzugefügt</p>
+            )}
+
+            <div className="space-y-2">
+              {(globalExercises || []).map(ex => (
+                <div key={ex.id} className="flex items-start gap-3 bg-blue-50 rounded-xl px-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-800 text-sm">{ex.name}</div>
+                    <div className="text-xs text-gray-500">{ex.pattern} · {ex.variants?.length} Varianten</div>
+                    <div className="text-xs text-blue-500 mt-0.5">🌐 Global sichtbar</div>
+                  </div>
+                  <button onClick={() => onRemoveGlobalExercise(ex.id)}
+                    className="text-red-400 text-sm px-2 py-1 rounded-lg flex-shrink-0 active:bg-red-50">✕</button>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-2">Basis-Übungen ({EXERCISES.length})</div>
+              <div className="space-y-1.5">
+                {EXERCISES.map(ex => (
+                  <div key={ex.id} className="flex items-center gap-2 bg-gray-50 rounded-xl px-4 py-2.5">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-700 text-sm">{ex.name}</div>
+                      <div className="text-xs text-gray-400">{ex.pattern}</div>
+                    </div>
+                    <div className="text-xs text-gray-400 flex-shrink-0">{ex.variants.length} Var.</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>

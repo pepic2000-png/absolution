@@ -12,6 +12,8 @@ import { selectExercises, selectBurnout, EXERCISES } from './exercises'
 import useSavedPlans from './hooks/useSavedPlans'
 import useSharedPlans from './hooks/useSharedPlans'
 import useExerciseMedia from './hooks/useExerciseMedia'
+import useGlobalExercises from './hooks/useGlobalExercises'
+import useLocalExercises from './hooks/useLocalExercises'
 
 const S = { SETUP: 0, PREVIEW: 1, BUILDER: 2, WORKOUT: 3, PAUSE: 4, BURNOUT: 5, DONE: 6, ADMIN: 7 }
 
@@ -35,6 +37,10 @@ export default function App() {
   const { plans: localPlans, savePlan, deletePlan } = useSavedPlans()
   const { sharedPlans, publishPlan, unpublishPlan } = useSharedPlans()
   const { media, setExerciseMedia, removeExerciseMedia } = useExerciseMedia()
+  const { globalExercises, addGlobalExercise, removeGlobalExercise } = useGlobalExercises()
+  const { localExercises, addLocalExercise, removeLocalExercise } = useLocalExercises()
+
+  const allExtraExercises = [...globalExercises, ...localExercises]
 
   function handleUnlock(password) {
     if (password === ADMIN_PASSWORD) {
@@ -60,7 +66,7 @@ export default function App() {
   }
 
   function handleSetupDone(cfg) {
-    const exs = selectExercises(cfg.exerciseCount, cfg.selectedLevels)
+    const exs = selectExercises(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises)
     const bo = cfg.burnoutEnabled ? selectBurnout(cfg.selectedLevels) : null
     setConfig(cfg)
     setExercises(exs)
@@ -76,8 +82,9 @@ export default function App() {
   function handleLoadPlan(plan, isShared = false) {
     const cfg = plan.config
     setConfig(cfg)
+    const allEx = [...EXERCISES, ...allExtraExercises]
     const exs = plan.exercises
-      .map(id => EXERCISES.find(e => e.id === id))
+      .map(id => allEx.find(e => e.id === id))
       .filter(Boolean)
       .map(ex => ({ ...ex, variants: ex.variants.filter(v => cfg.selectedLevels.includes(v.level)) }))
     const bo = cfg.burnoutEnabled ? selectBurnout(cfg.selectedLevels) : null
@@ -164,6 +171,7 @@ export default function App() {
           onConfirm={handlePreviewConfirm}
           onBack={() => setScreen(S.SETUP)}
           onSavePlan={(name, exs) => savePlan(name, exs, config)}
+          extraExercises={allExtraExercises}
         />
       )}
       {unlocked && screen === S.BUILDER && (
@@ -172,6 +180,10 @@ export default function App() {
           config={config}
           onConfirm={handleBuilderConfirm}
           onBack={() => setScreen(S.SETUP)}
+          globalExercises={globalExercises}
+          localExercises={localExercises}
+          onAddLocalExercise={addLocalExercise}
+          onRemoveLocalExercise={removeLocalExercise}
         />
       )}
       {unlocked && screen === S.ADMIN && (
@@ -184,6 +196,9 @@ export default function App() {
           onRemoveMedia={removeExerciseMedia}
           localPlans={localPlans}
           onBack={() => setScreen(S.SETUP)}
+          globalExercises={globalExercises}
+          onAddGlobalExercise={addGlobalExercise}
+          onRemoveGlobalExercise={removeGlobalExercise}
         />
       )}
       {unlocked && screen === S.WORKOUT && (
