@@ -129,8 +129,13 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
               📋 {savedPlans.length + sharedPlans.length}
             </button>
           )}
-          {isAdmin && (
+          {isAdmin ? (
             <button onClick={onOpenAdmin}
+              className="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-xl active:bg-gray-200">
+              ⚙️
+            </button>
+          ) : (
+            <button onClick={() => setShowAdminModal(true)}
               className="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-xl active:bg-gray-200">
               ⚙️
             </button>
@@ -287,18 +292,13 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
           className="w-full bg-white text-gray-800 font-semibold text-base py-3.5 rounded-2xl active:bg-gray-50 border border-gray-200">
           ✏️ Eigenen Plan erstellen
         </button>
-        <div className="flex justify-center pt-1 pb-1">
-          {isAdmin ? (
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-green-600 font-medium">⚙️ Admin-Modus aktiv</span>
-              <button onClick={onAdminLogout} className="text-xs text-gray-400 underline">Abmelden</button>
-            </div>
-          ) : (
-            <button onClick={() => setShowAdminModal(true)} className="text-xs text-gray-400 active:text-gray-600">
-              Als Admin anmelden
+        {isAdmin && (
+          <div className="flex justify-center pt-1">
+            <button onClick={onAdminLogout} className="text-xs text-gray-400 underline">
+              Admin abmelden
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Admin login modal */}
