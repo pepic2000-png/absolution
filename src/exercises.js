@@ -1375,6 +1375,31 @@ export function selectExercises(count, levels = ALL_LEVELS, extraExercises = [])
   }))
 }
 
+// Single mode: each exercise gets exactly one variant (round-robin over selected levels)
+export function selectExercisesSingle(count, levels = ALL_LEVELS, extraExercises = []) {
+  const allExercises = [...EXERCISES, ...extraExercises]
+  const activation = allExercises.find(e => e.id === 'dead-bug') || allExercises[0]
+  const rest = allExercises.filter(e => e.id !== activation.id)
+  const shuffled = shuffle(rest)
+
+  const selected = [activation]
+  let lastPattern = activation.pattern
+  for (const ex of shuffled) {
+    if (selected.length >= count) break
+    if (ex.pattern !== lastPattern) { selected.push(ex); lastPattern = ex.pattern }
+  }
+  for (const ex of shuffled) {
+    if (selected.length >= count) break
+    if (!selected.find(s => s.id === ex.id)) selected.push(ex)
+  }
+
+  return selected.slice(0, count).map((ex, i) => {
+    const level = levels[i % levels.length]
+    const variant = ex.variants.find(v => v.level === level) || ex.variants.find(v => levels.includes(v.level))
+    return { ...ex, variants: variant ? [variant] : [] }
+  }).filter(ex => ex.variants.length > 0)
+}
+
 export function selectBurnout(levels = ALL_LEVELS) {
   const picked = shuffle(BURNOUT_EXERCISES)[0]
   return { ...picked, variants: picked.variants.filter(v => levels.includes(v.level)) }

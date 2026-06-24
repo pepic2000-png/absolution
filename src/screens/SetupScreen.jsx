@@ -43,6 +43,7 @@ function Toggle({ on, onChange }) {
 }
 
 export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, savedPlans, sharedPlans = [], onLoadPlan, onDeletePlan, isAdmin, onAdminSwitch, onAdminLogout }) {
+  const [workoutMode, setWorkoutMode] = useState('variants') // 'variants' | 'single'
   const [exerciseCount, setExerciseCount] = useState(4)
   const [variantDuration, setVariantDuration] = useState(30)
   const [pauseDuration, setPauseDuration] = useState(15)
@@ -73,15 +74,16 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
   const variantCount = selectedLevels.length
 
   const summary = useMemo(() => {
-    const workoutTime = exerciseCount * variantCount * variantDuration
+    const effectiveVariants = workoutMode === 'single' ? 1 : variantCount
+    const workoutTime = exerciseCount * effectiveVariants * variantDuration
     const pauseTime = (exerciseCount - 1) * pauseDuration
-    const burnoutTime = burnoutEnabled ? burnoutDuration * variantCount : 0
+    const burnoutTime = burnoutEnabled ? burnoutDuration * (workoutMode === 'single' ? 1 : variantCount) : 0
     const total = workoutTime + pauseTime + burnoutTime
-    return { total, sets: exerciseCount * variantCount }
-  }, [exerciseCount, variantCount, variantDuration, pauseDuration, burnoutEnabled, burnoutDuration])
+    return { total, sets: exerciseCount * effectiveVariants }
+  }, [workoutMode, exerciseCount, variantCount, variantDuration, pauseDuration, burnoutEnabled, burnoutDuration])
 
   function currentConfig() {
-    return { exerciseCount, variantDuration, pauseDuration, burnoutEnabled, burnoutDuration, selectedLevels }
+    return { workoutMode, exerciseCount, variantDuration, pauseDuration, burnoutEnabled, burnoutDuration, selectedLevels }
   }
 
   function handleStart() {
@@ -188,6 +190,37 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
       {/* Scrollable config */}
       <div className="flex-1 overflow-y-auto px-5 space-y-5 pb-2">
 
+        {/* Workout-Modus */}
+        <div>
+          <div className="font-semibold text-gray-800 mb-2">Trainings-Modus</div>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => setWorkoutMode('variants')}
+              className="p-3 rounded-xl text-left transition-all"
+              style={{
+                backgroundColor: workoutMode === 'variants' ? '#111' : '#f5f5f5',
+                color: workoutMode === 'variants' ? '#fff' : '#555',
+                border: `2px solid ${workoutMode === 'variants' ? '#111' : 'transparent'}`,
+              }}
+            >
+              <div className="font-bold text-sm mb-0.5">Varianten</div>
+              <div className="text-xs opacity-70">1 Übung × alle Level</div>
+            </button>
+            <button
+              onClick={() => setWorkoutMode('single')}
+              className="p-3 rounded-xl text-left transition-all"
+              style={{
+                backgroundColor: workoutMode === 'single' ? '#111' : '#f5f5f5',
+                color: workoutMode === 'single' ? '#fff' : '#555',
+                border: `2px solid ${workoutMode === 'single' ? '#111' : 'transparent'}`,
+              }}
+            >
+              <div className="font-bold text-sm mb-0.5">Quer durch</div>
+              <div className="text-xs opacity-70">Übungen × 1 Level</div>
+            </button>
+          </div>
+        </div>
+
         <div className="flex items-center justify-between">
           <div>
             <div className="font-semibold text-gray-800">Übungen</div>
@@ -214,7 +247,11 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
               )
             })}
           </div>
-          <div className="text-xs text-gray-400 mt-1.5">{variantCount} Variante{variantCount !== 1 ? 'n' : ''} pro Übung</div>
+          <div className="text-xs text-gray-400 mt-1.5">
+            {workoutMode === 'single'
+              ? `${variantCount} Level${variantCount !== 1 ? 's' : ''} im Pool — je Übung 1 Level zugeteilt`
+              : `${variantCount} Variante${variantCount !== 1 ? 'n' : ''} pro Übung`}
+          </div>
         </div>
 
         <div>
@@ -286,7 +323,7 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
       <div className="px-5 pt-3 flex flex-col gap-2 flex-shrink-0">
         <button onClick={handleStart} disabled={selectedLevels.length === 0}
           className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl active:opacity-90 disabled:opacity-40">
-          Zufälliges Workout →
+          {workoutMode === 'single' ? 'Quer-Workout starten →' : 'Varianten-Workout →'}
         </button>
         <button onClick={() => { unlockAudio(); onOpenBuilder(currentConfig()) }}
           className="w-full bg-white text-gray-800 font-semibold text-base py-3.5 rounded-2xl active:bg-gray-50 border border-gray-200">

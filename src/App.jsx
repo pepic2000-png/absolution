@@ -8,7 +8,7 @@ import WorkoutScreen from './screens/WorkoutScreen'
 import PauseScreen from './screens/PauseScreen'
 import BurnoutScreen from './screens/BurnoutScreen'
 import DoneScreen from './screens/DoneScreen'
-import { selectExercises, selectBurnout, EXERCISES } from './exercises'
+import { selectExercises, selectExercisesSingle, selectBurnout, EXERCISES } from './exercises'
 import useSavedPlans from './hooks/useSavedPlans'
 import useSharedPlans from './hooks/useSharedPlans'
 import useExerciseMedia from './hooks/useExerciseMedia'
@@ -66,7 +66,9 @@ export default function App() {
   }
 
   function handleSetupDone(cfg) {
-    const exs = selectExercises(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises)
+    const exs = cfg.workoutMode === 'single'
+      ? selectExercisesSingle(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises)
+      : selectExercises(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises)
     const bo = cfg.burnoutEnabled ? selectBurnout(cfg.selectedLevels) : null
     setConfig(cfg)
     setExercises(exs)
@@ -83,10 +85,16 @@ export default function App() {
     const cfg = plan.config
     setConfig(cfg)
     const allEx = [...EXERCISES, ...allExtraExercises]
-    const exs = plan.exercises
+    const mapped = plan.exercises
       .map(id => allEx.find(e => e.id === id))
       .filter(Boolean)
-      .map(ex => ({ ...ex, variants: ex.variants.filter(v => cfg.selectedLevels.includes(v.level)) }))
+    const exs = cfg.workoutMode === 'single'
+      ? mapped.map((ex, i) => {
+          const level = cfg.selectedLevels[i % cfg.selectedLevels.length]
+          const variant = ex.variants.find(v => v.level === level) || ex.variants.find(v => cfg.selectedLevels.includes(v.level))
+          return { ...ex, variants: variant ? [variant] : [] }
+        }).filter(ex => ex.variants.length > 0)
+      : mapped.map(ex => ({ ...ex, variants: ex.variants.filter(v => cfg.selectedLevels.includes(v.level)) }))
     const bo = cfg.burnoutEnabled ? selectBurnout(cfg.selectedLevels) : null
     setExercises(exs)
     setBurnout(bo)
@@ -95,7 +103,15 @@ export default function App() {
 
   function handleBuilderConfirm(confirmedExercises, planName) {
     if (planName) savePlan(planName, confirmedExercises, config)
-    setExercises(confirmedExercises)
+    // In single mode, each exercise keeps only the variant matching its assigned level
+    const exs = config.workoutMode === 'single'
+      ? confirmedExercises.map((ex, i) => {
+          const level = config.selectedLevels[i % config.selectedLevels.length]
+          const variant = ex.variants.find(v => v.level === level) || ex.variants[0]
+          return { ...ex, variants: variant ? [variant] : ex.variants }
+        })
+      : confirmedExercises
+    setExercises(exs)
     setBurnout(config.burnoutEnabled ? selectBurnout(config.selectedLevels) : null)
     setScreen(S.PREVIEW)
   }
