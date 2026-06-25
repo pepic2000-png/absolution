@@ -67,8 +67,8 @@ export default function App() {
 
   function handleSetupDone(cfg) {
     const exs = cfg.workoutMode === 'single'
-      ? selectExercisesSingle(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises)
-      : selectExercises(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises)
+      ? selectExercisesSingle(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises, cfg.availableEquipment)
+      : selectExercises(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises, cfg.availableEquipment)
     const bo = cfg.burnoutEnabled ? selectBurnout(cfg.selectedLevels) : null
     setConfig(cfg)
     setExercises(exs)
@@ -103,15 +103,8 @@ export default function App() {
 
   function handleBuilderConfirm(confirmedExercises, planName) {
     if (planName) savePlan(planName, confirmedExercises, config)
-    // In single mode, each exercise keeps only the variant matching its assigned level
-    const exs = config.workoutMode === 'single'
-      ? confirmedExercises.map((ex, i) => {
-          const level = config.selectedLevels[i % config.selectedLevels.length]
-          const variant = ex.variants.find(v => v.level === level) || ex.variants[0]
-          return { ...ex, variants: variant ? [variant] : ex.variants }
-        })
-      : confirmedExercises
-    setExercises(exs)
+    // Exercises from plan builder already have exactly 1 variant each
+    setExercises(confirmedExercises)
     setBurnout(config.burnoutEnabled ? selectBurnout(config.selectedLevels) : null)
     setScreen(S.PREVIEW)
   }
@@ -129,7 +122,13 @@ export default function App() {
     if (isLast) {
       setScreen(config.burnoutEnabled && burnout ? S.BURNOUT : S.DONE)
     } else {
-      setScreen(S.PAUSE)
+      const pauseDur = exercise.pauseAfter ?? config.pauseDuration
+      if (pauseDur === 0) {
+        setCurrentExIdx(i => i + 1)
+        setScreen(S.WORKOUT)
+      } else {
+        setScreen(S.PAUSE)
+      }
     }
   }
 
@@ -156,7 +155,7 @@ export default function App() {
   )
 
   return (
-    <div className="bg-white no-select" style={{ height: '100dvh', overflow: 'hidden' }}>
+    <div className="bg-white no-select" style={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
       {!unlocked && (
         <LockScreen onUnlock={() => {
           localStorage.setItem('corefit_unlocked', '1')
@@ -184,6 +183,7 @@ export default function App() {
         <ExercisePreviewScreen
           exercises={exercises}
           selectedLevels={config.selectedLevels}
+          availableEquipment={config.availableEquipment || ['none']}
           onConfirm={handlePreviewConfirm}
           onBack={() => setScreen(S.SETUP)}
           onSavePlan={(name, exs) => savePlan(name, exs, config)}
@@ -231,7 +231,7 @@ export default function App() {
       )}
       {unlocked && screen === S.PAUSE && (
         <PauseScreen
-          duration={config.pauseDuration}
+          duration={exercises[currentExIdx]?.pauseAfter ?? config.pauseDuration}
           nextExercise={exercises[currentExIdx + 1]}
           config={config}
           muted={muted}

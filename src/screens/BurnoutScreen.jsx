@@ -62,7 +62,7 @@ export default function BurnoutScreen({ exercise, config, muted, onFinish }) {
     <div
       className="flex flex-col screen-enter"
       style={{
-        height: '100dvh',
+        height: '100%',
         paddingTop: 'max(14px, env(safe-area-inset-top))',
         paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
         background: 'linear-gradient(180deg, #fff5f2 0%, #fff 60%)',

@@ -115,7 +115,7 @@ export default function ExercisePreviewScreen({ exercises, selectedLevels, onCon
     <div
       className="flex flex-col bg-white screen-enter"
       style={{
-        height: '100dvh',
+        height: '100%',
         paddingTop: 'max(20px, env(safe-area-inset-top))',
         paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
       }}

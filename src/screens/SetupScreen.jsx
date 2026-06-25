@@ -138,7 +138,7 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
   return (
     <div className="flex flex-col bg-white screen-enter"
       style={{
-        height: '100dvh',
+        height: '100%',
         paddingTop: 'max(20px, env(safe-area-inset-top))',
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}

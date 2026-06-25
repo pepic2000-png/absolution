@@ -7,20 +7,24 @@
   -webkit-font-smoothing: antialiased;
 }
 
-html, body, #root {
+html {
   height: 100%;
-  overscroll-behavior: none;
+  background: #fff;
 }
 
 body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overscroll-behavior: none;
   background: #fff;
   color: #111;
-  margin: 0;
 }
 
 #root {
-  width: 100%;
-  min-height: 100%;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
 }
 
 .safe-top { padding-top: max(env(safe-area-inset-top), 16px); }

@@ -30,7 +30,7 @@ export default function PauseScreen({ duration, nextExercise, config, muted, onR
     <div
       className="flex flex-col items-center justify-center px-5 screen-enter"
       style={{
-        height: '100dvh',
+        height: '100%',
         paddingTop: 'max(24px, env(safe-area-inset-top))',
         paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
       }}
