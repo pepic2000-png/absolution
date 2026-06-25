@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { EXERCISES } from '../exercises'
 import ExerciseForm from '../components/ExerciseForm'
+import { storage } from '../firebase'
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 
 export default function AdminScreen({
   sharedPlans, onPublishPlan, onUnpublishPlan,
@@ -8,7 +10,7 @@ export default function AdminScreen({
   localPlans, onBack,
   globalExercises, onAddGlobalExercise, onRemoveGlobalExercise,
 }) {
-  const [tab, setTab] = useState('plans') // 'plans' | 'videos' | 'exercises'
+  const [tab, setTab] = useState('plans')
   const [publishing, setPublishing] = useState(null)
   const [publishName, setPublishName] = useState('')
   const [editingMedia, setEditingMedia] = useState(null)
@@ -16,8 +18,39 @@ export default function AdminScreen({
   const [mediaType, setMediaType] = useState('youtube')
   const [frameUrl1, setFrameUrl1] = useState('')
   const [frameUrl2, setFrameUrl2] = useState('')
+  const [uploadProgress, setUploadProgress] = useState({}) // { '1': 0-100, '2': 0-100 }
   const [saving, setSaving] = useState(false)
   const [showExerciseForm, setShowExerciseForm] = useState(false)
+  const fileInput1 = useRef(null)
+  const fileInput2 = useRef(null)
+
+  async function uploadImage(file, slot, exerciseId) {
+    const ext = file.name.split('.').pop()
+    const path = `exerciseMedia/${exerciseId}/frame${slot}.${ext}`
+    const storageRef = ref(storage, path)
+    return new Promise((resolve, reject) => {
+      const task = uploadBytesResumable(storageRef, file)
+      task.on('state_changed',
+        snap => setUploadProgress(p => ({ ...p, [slot]: Math.round(snap.bytesTransferred / snap.totalBytes * 100) })),
+        reject,
+        async () => { resolve(await getDownloadURL(task.snapshot.ref)) }
+      )
+    })
+  }
+
+  async function handleFileSelect(e, slot) {
+    const file = e.target.files[0]
+    if (!file || !editingMedia) return
+    setUploadProgress(p => ({ ...p, [slot]: 0 }))
+    try {
+      const url = await uploadImage(file, slot, editingMedia)
+      if (slot === 1) setFrameUrl1(url)
+      else setFrameUrl2(url)
+    } catch {
+      alert('Upload fehlgeschlagen')
+    }
+    setUploadProgress(p => { const n = { ...p }; delete n[slot]; return n })
+  }
 
   async function handlePublish(plan) {
     if (!publishName.trim()) return
@@ -44,6 +77,7 @@ export default function AdminScreen({
     setMediaUrl('')
     setFrameUrl1('')
     setFrameUrl2('')
+    setUploadProgress({})
   }
 
   async function handleAddGlobalExercise(exercise) {
@@ -206,12 +240,32 @@ export default function AdminScreen({
                       </div>
                       {mediaType === 'frames' ? (
                         <>
-                          <input type="text" value={frameUrl1} onChange={e => setFrameUrl1(e.target.value)}
-                            placeholder="URL Startposition (https://...jpg)"
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-gray-400" />
-                          <input type="text" value={frameUrl2} onChange={e => setFrameUrl2(e.target.value)}
-                            placeholder="URL Endposition (https://...jpg)"
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-gray-400" />
+                          {[['1', 'Startposition', frameUrl1, setFrameUrl1, fileInput1],
+                            ['2', 'Endposition',   frameUrl2, setFrameUrl2, fileInput2]].map(([slot, label, url, setUrl, inputRef]) => (
+                            <div key={slot} className="space-y-1">
+                              <div className="text-xs font-medium text-gray-500">{label}</div>
+                              <div className="flex gap-2">
+                                <input type="text" value={url} onChange={e => setUrl(e.target.value)}
+                                  placeholder="https://... oder Foto hochladen"
+                                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-gray-400 min-w-0" />
+                                <button onClick={() => inputRef.current?.click()}
+                                  className="flex-shrink-0 bg-gray-100 px-3 py-2 rounded-xl text-sm font-semibold active:bg-gray-200">
+                                  📁
+                                </button>
+                                <input ref={inputRef} type="file" accept="image/*" className="hidden"
+                                  onChange={e => handleFileSelect(e, Number(slot))} />
+                              </div>
+                              {uploadProgress[slot] !== undefined && (
+                                <div className="w-full bg-gray-100 rounded-full h-1.5">
+                                  <div className="bg-gray-900 h-1.5 rounded-full transition-all"
+                                    style={{ width: `${uploadProgress[slot]}%` }} />
+                                </div>
+                              )}
+                              {url && !uploadProgress[slot] && (
+                                <img src={url} alt={label} className="w-full h-24 object-cover rounded-xl" />
+                              )}
+                            </div>
+                          ))}
                         </>
                       ) : (
                         <>
