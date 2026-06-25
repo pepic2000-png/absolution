@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { sounds } from '../audio'
 
 const VARIANT_COLORS = {
@@ -38,22 +38,32 @@ function CompactRingTimer({ seconds, total, color }) {
 export default function WorkoutScreen({
   exercise, exerciseIndex, totalExercises, config, muted, onFinish, media = {}
 }) {
+  const exDuration = exercise.variantDuration ?? config.variantDuration
   const [variantIdx, setVariantIdx] = useState(0)
-  const [seconds, setSeconds] = useState(config.variantDuration)
+  const [seconds, setSeconds] = useState(exDuration)
   const [paused, setPaused] = useState(false)
   const [isLandscape, setIsLandscape] = useState(
     () => window.matchMedia('(orientation: landscape)').matches
   )
   const pausedRef = useRef(false)
-  const secondsRef = useRef(config.variantDuration)
+  const secondsRef = useRef(exDuration)
   const variantIdxRef = useRef(0)
   const doneRef = useRef(false)
 
   const variants = exercise.variants
   const currentVariant = variants[variantIdx]
   const c = VARIANT_COLORS[currentVariant?.level] || VARIANT_COLORS.easy
-  const exerciseMedia = media[exercise.id]
+  const variantKey = `${exercise.id}__${currentVariant?.level}`
+  const rawMedia = media[variantKey] || media[`${exercise.id}__easy`]
+  const exerciseMedia = rawMedia?.sameAsEasy ? media[`${exercise.id}__easy`] : rawMedia
   const ytId = exerciseMedia?.type === 'youtube' ? getYouTubeId(exerciseMedia.url) : null
+  const isFrames = exerciseMedia?.type === 'frames' && exerciseMedia?.frames?.length >= 2
+  const [frameIdx, setFrameIdx] = useState(0)
+  useEffect(() => {
+    if (!isFrames) return
+    const t = setInterval(() => setFrameIdx(i => (i + 1) % exerciseMedia.frames.length), 900)
+    return () => clearInterval(t)
+  }, [isFrames, exerciseMedia?.frames?.length])
 
   useEffect(() => {
     const mq = window.matchMedia('(orientation: landscape)')
@@ -72,10 +82,10 @@ export default function WorkoutScreen({
     }
     variantIdxRef.current = nextIdx
     setVariantIdx(nextIdx)
-    secondsRef.current = config.variantDuration
-    setSeconds(config.variantDuration)
+    secondsRef.current = exDuration
+    setSeconds(exDuration)
     playSound(sounds.variantChange)
-  }, [variants.length, config.variantDuration, onFinish, muted])
+  }, [variants.length, exDuration, onFinish, muted])
 
   useEffect(() => {
     playSound(sounds.variantStart)
@@ -95,8 +105,17 @@ export default function WorkoutScreen({
 
   const progress = (exerciseIndex + variantIdx / variants.length) / totalExercises
 
-  // Video embed (always visible, muted autoplay loop for demo)
-  const videoEmbed = ytId ? (
+  // Media display
+  const videoEmbed = isFrames ? (
+    <div className="w-full h-full relative">
+      {exerciseMedia.frames.map((src, i) => (
+        <img key={i} src={src} alt=""
+          className="absolute inset-0 w-full h-full object-contain"
+          style={{ opacity: i === frameIdx ? 1 : 0, transition: 'opacity 0.3s ease' }}
+        />
+      ))}
+    </div>
+  ) : ytId ? (
     <iframe
       key={ytId}
       src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&playsinline=1&controls=0&modestbranding=1&rel=0`}
@@ -143,7 +162,7 @@ export default function WorkoutScreen({
 
       {/* Timer + current variant */}
       <div className="flex items-center gap-3 mb-2 flex-shrink-0">
-        <CompactRingTimer seconds={seconds} total={config.variantDuration} color={c.stroke} />
+        <CompactRingTimer seconds={seconds} total={exDuration} color={c.stroke} />
         <div className="flex-1 min-w-0">
           <div className="font-bold text-gray-900 text-sm leading-tight">{currentVariant?.name}</div>
           <div className="text-xs text-gray-500 mt-0.5 leading-snug line-clamp-3">{currentVariant?.desc}</div>
@@ -184,8 +203,8 @@ export default function WorkoutScreen({
         /* ── LANDSCAPE: video left, content right ── */
         <div className="flex flex-1 min-h-0">
           {/* Video half */}
-          <div className="flex-1 bg-black relative flex items-center justify-center"
-            style={{ paddingLeft: 'env(safe-area-inset-left)' }}>
+          <div className="flex-1 relative flex items-center justify-center"
+            style={{ paddingLeft: 'env(safe-area-inset-left)', backgroundColor: isFrames ? '#f5f5f5' : '#000' }}>
             {videoEmbed ? (
               <div className="w-full h-full">{videoEmbed}</div>
             ) : (
@@ -221,8 +240,12 @@ export default function WorkoutScreen({
             paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
           }}>
           {/* Video block */}
-          <div className="bg-black flex-shrink-0 relative flex items-center justify-center"
-            style={{ aspectRatio: '16/9', maxHeight: '38vh' }}>
+          <div className="flex-shrink-0 relative flex items-center justify-center"
+            style={{
+              aspectRatio: '16/9',
+              maxHeight: '40vh',
+              backgroundColor: isFrames ? '#f5f5f5' : '#000',
+            }}>
             {videoEmbed ? (
               <div className="w-full h-full">{videoEmbed}</div>
             ) : (

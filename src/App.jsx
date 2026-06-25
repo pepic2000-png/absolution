@@ -188,6 +188,7 @@ export default function App() {
           onBack={() => setScreen(S.SETUP)}
           onSavePlan={(name, exs) => savePlan(name, exs, config)}
           extraExercises={allExtraExercises}
+          media={media}
         />
       )}
       {unlocked && screen === S.BUILDER && (
@@ -200,6 +201,7 @@ export default function App() {
           localExercises={localExercises}
           onAddLocalExercise={addLocalExercise}
           onRemoveLocalExercise={removeLocalExercise}
+          media={media}
         />
       )}
       {unlocked && screen === S.ADMIN && (

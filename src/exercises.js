@@ -7,6 +7,7 @@ export const EXERCISES = [
     name: 'Dead Bug',
     pattern: 'anti-extension',
     concept: 'Trainiert die tiefe Stabilisation — Rücken bleibt flach, während Extremitäten sich bewegen.',
+    equipment: ['none', 'dumbbell', 'band'],
     variants: [
       {
         level: 'easy',
@@ -43,6 +44,7 @@ export const EXERCISES = [
     name: 'Plank Shoulder Tap',
     pattern: 'anti-rotation',
     concept: 'Erzwingt Rotationsstabilität — der Rumpf bleibt absolut still während ein Arm schwebt.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -79,6 +81,7 @@ export const EXERCISES = [
     name: 'Side Plank',
     pattern: 'lateral-flexion',
     concept: 'Isoliert die seitliche Rumpfkette — Quadratus lumborum und Obliques unter echter Last.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -115,6 +118,7 @@ export const EXERCISES = [
     name: 'Hollow Body Hold',
     pattern: 'anti-extension',
     concept: 'Die Grundform der Kernspannung — maximale Anti-Extension in der gesamten Körperlinie.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -151,6 +155,7 @@ export const EXERCISES = [
     name: 'Mountain Climber',
     pattern: 'hip-flexion',
     concept: 'Dynamische Hüftflexion unter Rumpfstabilisierung — Koordination trifft Kondition.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -187,6 +192,7 @@ export const EXERCISES = [
     name: 'Bicycle Crunch',
     pattern: 'rotation',
     concept: 'Rotationskraft mit Anti-Rotation — die Obliques arbeiten in ihrer natürlichen Funktion.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -223,6 +229,7 @@ export const EXERCISES = [
     name: 'Russian Twist',
     pattern: 'rotation',
     concept: 'Rotationsstärke unter Belastung — die Wirbelsäule dreht, der Rumpf kontrolliert.',
+    equipment: ['none', 'dumbbell'],
     variants: [
       {
         level: 'easy',
@@ -259,6 +266,7 @@ export const EXERCISES = [
     name: 'Reverse Crunch',
     pattern: 'hip-flexion',
     concept: 'Unteren Bauch und Hüftbeuger ansteuern — Becken bewegt sich, nicht die Beine.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -295,6 +303,7 @@ export const EXERCISES = [
     name: 'Leg Raise',
     pattern: 'hip-flexion',
     concept: 'Maximale Hüftbeugerkraft und untere Bauchmuskelkontrolle in der Absenkphase.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -331,34 +340,14 @@ export const EXERCISES = [
     name: 'Pallof Press',
     pattern: 'anti-rotation',
     concept: 'Anti-Rotationsübung par excellence — der Rumpf widersteht dem seitlichen Zug.',
+    equipment: ['cable', 'band'],
     variants: [
       {
-        level: 'easy',
-        label: 'Leicht',
-        name: 'Pallof Press — Isometric Hold',
-        desc: 'Band oder Kabel seitlich, Hände vor der Brust halten. Position halten.',
-        cue: 'Schultern gerade — keine Drehung zur Seite erlaubt.',
-      },
-      {
-        level: 'medium',
-        label: 'Mittel',
-        name: 'Pallof Press — Presse',
-        desc: 'Hände zur Brust, dann Arme strecken und zurück. Kontrolliert.',
-        cue: 'Der Moment der Streckung ist der schwerste — dort kommt der Zug.',
-      },
-      {
-        level: 'hard',
-        label: 'Schwer',
-        name: 'Pallof Press — halb kniend',
-        desc: 'Knieender Stand, ein Knie vorne, Pallof Press ausführen.',
-        cue: 'Becken neutral — nicht zur Seite kippen wenn du drückst.',
-      },
-      {
-        level: 'maximum',
-        label: 'Maximum',
-        name: 'Pallof Press — stehend mit Rotation',
-        desc: 'Pallof Press, dann kontrolliert rotieren und zurück. Stehend.',
-        cue: 'Rotation ist erlaubt — aber sie muss kontrolliert sein, nicht passiv.',
+        level: 'weighted',
+        label: 'Ausführung',
+        name: 'Pallof Press',
+        desc: 'Band oder Kabel seitlich auf Brusthöhe. Hände zur Brust, Arme strecken und kontrolliert zurück. Stehend oder halbkniend.',
+        cue: 'Der Moment der Streckung ist der schwerste — Schultern gerade, keine Rotation.',
       },
     ],
   },
@@ -367,6 +356,7 @@ export const EXERCISES = [
     name: 'Ab Wheel Rollout',
     pattern: 'anti-extension',
     concept: 'Maximale Anti-Extension — das Rad erzwingt Stabilisierung über die gesamte Körperlänge.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -403,6 +393,7 @@ export const EXERCISES = [
     name: 'L-Sit Hold',
     pattern: 'hip-flexion',
     concept: 'Statische Hüftbeugerkraft kombiniert mit Druckkraft — komprimiert und stabilisiert.',
+    equipment: ['none', 'bar'],
     variants: [
       {
         level: 'easy',
@@ -439,6 +430,7 @@ export const EXERCISES = [
     name: 'Plank Hip Dip',
     pattern: 'lateral-flexion',
     concept: 'Seitliche Rumpfmuskulatur dynamisch — Plank als Basis für laterale Kontrolle.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -475,6 +467,7 @@ export const EXERCISES = [
     name: 'Bear Crawl Hold',
     pattern: 'bracing',
     concept: 'Quadrupede Stabilisierung — alle vier Punkte aktiv, Rumpf hält die Form unter Schwerkraft.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -511,6 +504,7 @@ export const EXERCISES = [
     name: 'V-Up',
     pattern: 'hip-flexion',
     concept: 'Explosiver Synchronisation von Ober- und Unterkörper — volle Rumpfkontraktion.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -547,6 +541,7 @@ export const EXERCISES = [
     name: 'Bird Dog',
     pattern: 'anti-extension',
     concept: 'Diagonale Verlängerung auf vier Punkten — Lendenwirbelsäule neutral unter Bewegungsanforderung.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -583,34 +578,14 @@ export const EXERCISES = [
     name: 'Suitcase Carry (Anti-Lateral)',
     pattern: 'lateral-flexion',
     concept: 'Seitliche Rumpfstabilisierung unter Last — Quadratus lumborum gegen echten Widerstand.',
+    equipment: ['dumbbell'],
     variants: [
       {
-        level: 'easy',
-        label: 'Leicht',
-        name: 'Suitcase Hold — stehend',
-        desc: 'Gewicht einseitig halten (Hantel/Flasche), aufrecht stehen, 30 Sek pro Seite.',
+        level: 'weighted',
+        label: 'Ausführung',
+        name: 'Suitcase Carry',
+        desc: 'Hantel einseitig halten, aufrecht gehen. Seite nach Hälfte der Zeit wechseln. Gewicht: so schwer, dass der Rumpf arbeiten muss.',
         cue: 'Nicht zur Gewichtsseite kippen — genau das ist die Übung.',
-      },
-      {
-        level: 'medium',
-        label: 'Mittel',
-        name: 'Suitcase Walk — langsam',
-        desc: 'Einseitig Gewicht tragen, langsam im Raum bewegen. Aufrechte Haltung.',
-        cue: 'Schulter auf der Lastseite nicht hochziehen.',
-      },
-      {
-        level: 'hard',
-        label: 'Schwer',
-        name: 'Suitcase Walk — schweres Gewicht',
-        desc: 'Schweres einseitiges Gewicht, bewusstes Gegensteuern mit dem Rumpf.',
-        cue: 'Jeder Schritt ist eine Rumpfübung — nicht nur ein Spaziergang.',
-      },
-      {
-        level: 'maximum',
-        label: 'Maximum',
-        name: 'Overhead Carry — einseitig',
-        desc: 'Gewicht über Kopf auf einer Seite tragen. Maximale Stabilisierungsanforderung.',
-        cue: 'Arm aktiv nach oben drücken — nicht nur passive Last.',
       },
     ],
   },
@@ -619,6 +594,7 @@ export const EXERCISES = [
     name: 'Copenhagen Plank',
     pattern: 'lateral-flexion',
     concept: 'Adduktoren und seitliche Hüfte unter echter Belastung — oft vernachlässigt, extrem effektiv.',
+    equipment: ['bench'],
     variants: [
       {
         level: 'easy',
@@ -655,6 +631,7 @@ export const EXERCISES = [
     name: 'Stir the Pot',
     pattern: 'bracing',
     concept: 'Globale Rumpfstabilisierung unter Kreisbewegung — maximale Aktivierung bei minimaler Bewegung.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -691,6 +668,7 @@ export const EXERCISES = [
     name: 'Toe Taps',
     pattern: 'hip-flexion',
     concept: 'Niedrigintensive Hüftbeugung mit Rumpfkontrolle — gut als Einstieg oder Ergänzung.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -727,6 +705,7 @@ export const EXERCISES = [
     name: 'Windshield Wiper',
     pattern: 'rotation',
     concept: 'Kontrollierte Rotation mit langen Hebeln — Obliques gegen echten Widerstand durch Beingewicht.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -763,6 +742,7 @@ export const EXERCISES = [
     name: 'Glute Bridge March',
     pattern: 'bracing',
     concept: 'Posteriore Kette und Rumpf kombiniert — Becken stabil während Beine marschieren.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -799,34 +779,14 @@ export const EXERCISES = [
     name: 'Woodchop / Chop',
     pattern: 'rotation',
     concept: 'Diagonale Rotationskraft — ganzheitliche Aktivierung der rotatorischen Kette.',
+    equipment: ['cable', 'band', 'dumbbell'],
     variants: [
       {
-        level: 'easy',
-        label: 'Leicht',
-        name: 'Chop — kniend',
-        desc: 'Halbkniend, Hände zusammen, Diagonalbewegung von hoch-außen nach tief-innen.',
-        cue: 'Die Bewegung kommt aus den Hüften, nicht aus den Armen.',
-      },
-      {
-        level: 'medium',
-        label: 'Mittel',
-        name: 'Chop — stehend',
-        desc: 'Stehend, Gewicht oder Band, Diagonalbewegung hochzum tief.',
-        cue: 'Füße bleiben am Boden — Rotation über Hüfte und Wirbelsäule.',
-      },
-      {
-        level: 'hard',
-        label: 'Schwer',
-        name: 'Chop — Ausfallschritt',
-        desc: 'Chop Bewegung kombiniert mit Ausfallschritt in Rotationsrichtung.',
-        cue: 'Unterkörper und Oberkörper arbeiten zusammen.',
-      },
-      {
-        level: 'maximum',
-        label: 'Maximum',
-        name: 'Chop — explosiv',
-        desc: 'Explosiver Power Chop mit schnellem Zurückführen. Maximale Kraftentwicklung.',
-        cue: 'Explosiv rein, kontrolliert raus — nicht umgekehrt.',
+        level: 'weighted',
+        label: 'Ausführung',
+        name: 'Cable / Band Woodchop',
+        desc: 'Stehend, Kabel/Band/Hantel diagonal von hoch-außen nach tief-innen ziehen. Seite nach Hälfte wechseln. Bewegung aus Hüfte und Wirbelsäule.',
+        cue: 'Füße bleiben am Boden — Rotation kommt aus der Hüfte, nicht den Armen.',
       },
     ],
   },
@@ -835,6 +795,7 @@ export const EXERCISES = [
     name: 'Dragon Flag',
     pattern: 'anti-extension',
     concept: 'Extreme Anti-Extension der gesamten Körperlinie — Schulterblätter als einziger Kontaktpunkt.',
+    equipment: ['bench', 'bar'],
     variants: [
       {
         level: 'easy',
@@ -871,6 +832,7 @@ export const EXERCISES = [
     name: 'Tuck Crunch',
     pattern: 'hip-flexion',
     concept: 'Kurze aber intensive Rumpfkontraktion — beide Enden gleichzeitig zur Mitte.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -907,6 +869,7 @@ export const EXERCISES = [
     name: 'Seated Leg Lift',
     pattern: 'hip-flexion',
     concept: 'Hüftbeugekraft in aufrechter Sitzposition — Stabilisierung ohne Rückenlage.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -943,6 +906,7 @@ export const EXERCISES = [
     name: 'Plank Walk',
     pattern: 'bracing',
     concept: 'Dynamisches Bracing — der Rumpf stabilisiert während der Körper die Stützposition wechselt.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -979,6 +943,7 @@ export const EXERCISES = [
     name: 'Oblique Crunch',
     pattern: 'lateral-flexion',
     concept: 'Direktes Training der seitlichen Bauchmuskulatur — laterale Flexion der Wirbelsäule.',
+    equipment: ['none', 'bar'],
     variants: [
       {
         level: 'easy',
@@ -1015,6 +980,7 @@ export const EXERCISES = [
     name: 'Hollow to Arch',
     pattern: 'bracing',
     concept: 'Volle Körperspannung in beide Richtungen — Rumpf wechselt zwischen zwei Extrempositionen.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1051,34 +1017,14 @@ export const EXERCISES = [
     name: 'Half Kneeling Pallof',
     pattern: 'anti-rotation',
     concept: 'Anti-Rotation in instabiler Knieposition — höherer Transfer auf sportliche Bewegungen.',
+    equipment: ['cable', 'band'],
     variants: [
       {
-        level: 'easy',
-        label: 'Leicht',
-        name: 'Half Kneeling Hold',
-        desc: 'Halbkniend (ein Knie am Boden), Hände vor der Brust, seitlichem Zug widerstehen.',
-        cue: 'Knie und Hüfte in einer Linie — Becken neutral.',
-      },
-      {
-        level: 'medium',
-        label: 'Mittel',
-        name: 'Half Kneeling Press',
-        desc: 'Halbkniend, Arme strecken und zurückziehen gegen seitlichen Widerstand.',
-        cue: 'Das Strecken der Arme erhöht den Drehmoment — dort widerstehen.',
-      },
-      {
-        level: 'hard',
-        label: 'Schwer',
-        name: 'Half Kneeling Rotation',
-        desc: 'Halbkniend, kontrolliert rotieren und zurück. Bewegung mit Kontrolle.',
-        cue: 'Rotation ist jetzt erlaubt — aber kontrolliert und bewusst.',
-      },
-      {
-        level: 'maximum',
-        label: 'Maximum',
-        name: 'Half Kneeling — wechselndes Knie',
-        desc: 'Press + Knienwechsel ohne Widerstand zu verlieren.',
-        cue: 'Der Knienwechsel destabilisiert — genau dort maximal widerstehen.',
+        level: 'weighted',
+        label: 'Ausführung',
+        name: 'Half Kneeling Chop',
+        desc: 'Ein Knie am Boden, Kabel/Band seitlich. Arme strecken gegen den Zug und kontrolliert zurück. Seite nach Hälfte wechseln.',
+        cue: 'Becken neutral — das Strecken der Arme erhöht den Hebel, dort widerstehen.',
       },
     ],
   },
@@ -1087,6 +1033,7 @@ export const EXERCISES = [
     name: 'Swimmers (Prone)',
     pattern: 'bracing',
     concept: 'Posteriore Rumpfstabilisierung in Bauchlage — Gegenspieler zu den Beuge-dominierten Übungen.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1123,6 +1070,7 @@ export const EXERCISES = [
     name: 'Hip Thrust Isometric',
     pattern: 'bracing',
     concept: 'Statischer Hüftstoß — Gesäß und Rumpf halten die Hüfte auf maximaler Höhe.',
+    equipment: ['none', 'bench'],
     variants: [
       {
         level: 'easy',
@@ -1159,6 +1107,7 @@ export const EXERCISES = [
     name: 'Hanging Knee Raise',
     pattern: 'hip-flexion',
     concept: 'Hängende Hüftbeugung — volle Dekompression der Wirbelsäule kombiniert mit Kernkraft.',
+    equipment: ['bar'],
     variants: [
       {
         level: 'easy',
@@ -1195,6 +1144,7 @@ export const EXERCISES = [
     name: 'Plank Pull Through',
     pattern: 'anti-rotation',
     concept: 'Einseitige Last destabilisiert den Plank — Rumpf muss aktiv Rotation verhindern.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1231,6 +1181,7 @@ export const EXERCISES = [
     name: 'Crunch / Sit-up',
     pattern: 'hip-flexion',
     concept: 'Klassische Rumpfbeugung — kurze Kontraktionsbewegung der geraden Bauchmuskulatur.',
+    equipment: ['none', 'dumbbell'],
     variants: [
       {
         level: 'easy',
@@ -1267,6 +1218,7 @@ export const EXERCISES = [
     name: 'Flutter Kicks',
     pattern: 'hip-flexion',
     concept: 'Kontinuierliche Beinbewegung mit isometrisch gehaltener Rumpfspannung — Ausdauer trifft Kraft.',
+    equipment: ['none', 'bar'],
     variants: [
       {
         level: 'easy',
@@ -1303,6 +1255,7 @@ export const EXERCISES = [
     name: 'Heel Touches',
     pattern: 'lateral-flexion',
     concept: 'Seitliche Bauchmuskelaktivierung durch diagonale Streckbewegung — niedrig, aber präzise.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1339,6 +1292,7 @@ export const EXERCISES = [
     name: 'Standing Knee Raise',
     pattern: 'hip-flexion',
     concept: 'Stehende Hüftbeugung — Core-Kontrolle in aufrechter Position, Transfer auf Sport.',
+    equipment: ['none', 'bar'],
     variants: [
       {
         level: 'easy',
@@ -1375,6 +1329,7 @@ export const EXERCISES = [
     name: 'Jackknife',
     pattern: 'hip-flexion',
     concept: 'Gleichzeitige Kontraktion von Ober- und Unterkörper zur Mitte — maximale Rumpfsynergie.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1411,6 +1366,7 @@ export const EXERCISES = [
     name: 'V-Sit Progression',
     pattern: 'bracing',
     concept: 'Statische Hüftbeugung und Rumpfspannung kombiniert — der Körper bildet ein stabiles V.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1447,34 +1403,14 @@ export const EXERCISES = [
     name: 'Resistance Crunch',
     pattern: 'hip-flexion',
     concept: 'Crunch gegen externen Widerstand — höhere Kraftentwicklung durch Band oder Kabel.',
+    equipment: ['band', 'cable'],
     variants: [
       {
-        level: 'easy',
-        label: 'Leicht',
-        name: 'Standing Band Crunch',
-        desc: 'Stehend, Band hinter dem Kopf fixiert, Oberkörper nach unten crunchen.',
-        cue: 'Hüfte still — nur der Oberkörper bewegt sich nach unten.',
-      },
-      {
-        level: 'medium',
-        label: 'Mittel',
-        name: 'Band Crunch — kniend',
-        desc: 'Kniend, Band oder Kabel von oben, Ellenbogen zu den Oberschenkeln.',
-        cue: 'Band unter Spannung halten — kein Loslassen am Tiefpunkt.',
-      },
-      {
-        level: 'hard',
-        label: 'Schwer',
-        name: 'Cable Crunch',
-        desc: 'Am Kabelzug kniend, Seil hinter dem Kopf, Crunchen gegen Widerstand.',
-        cue: 'Hüfte als Drehpunkt — Bewegung kommt aus dem Bauch, nicht dem Rücken.',
-      },
-      {
-        level: 'maximum',
-        label: 'Maximum',
-        name: 'Cable Crunch — schwer',
-        desc: 'Maximales Gewicht am Kabelzug, langsame exzentrische Phase.',
-        cue: '3-4 Sekunden hochkontrolliert zurück — das ist die Schlüsselphase.',
+        level: 'weighted',
+        label: 'Ausführung',
+        name: 'Cable / Band Crunch',
+        desc: 'Kniend am Kabelzug oder mit Band von oben. Seil/Band hinter dem Kopf, Ellenbogen zu den Oberschenkeln crunchen. Langsam zurück.',
+        cue: 'Hüfte als Drehpunkt — 3 Sek kontrolliert zurück ist die Schlüsselphase.',
       },
     ],
   },
@@ -1483,6 +1419,7 @@ export const EXERCISES = [
     name: 'RKC Plank',
     pattern: 'bracing',
     concept: 'Maximale Gesamtkörperspannung im Plank — alle Muskelgruppen gleichzeitig aktiviert.',
+    equipment: ['none', 'dumbbell'],
     variants: [
       {
         level: 'easy',
@@ -1519,6 +1456,7 @@ export const EXERCISES = [
     name: 'Star Side Plank',
     pattern: 'lateral-flexion',
     concept: 'Seitliche Rumpfstabilisierung in maximaler Ausladung — alle Extremitäten gestreckt.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1555,6 +1493,7 @@ export const EXERCISES = [
     name: 'Hanging Windshield Wiper',
     pattern: 'rotation',
     concept: 'Rotatorische Kraft am Reck — der Rumpf kontrolliert das Gewicht der Beine beim Pendeln.',
+    equipment: ['bar'],
     variants: [
       {
         level: 'easy',
@@ -1591,6 +1530,7 @@ export const EXERCISES = [
     name: 'Garhammer Raise',
     pattern: 'hip-flexion',
     concept: 'Hängende Hüftbeugung mit Hüftextension — maximale untere Bauchmuskelrekrutierung.',
+    equipment: ['bar'],
     variants: [
       {
         level: 'easy',
@@ -1627,6 +1567,7 @@ export const EXERCISES = [
     name: 'Plank Jack',
     pattern: 'bracing',
     concept: 'Dynamisches Bracing mit Beinbewegung — Rumpf stabilisiert während Beine springen.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1663,6 +1604,7 @@ export const EXERCISES = [
     name: 'Supine March',
     pattern: 'anti-extension',
     concept: 'Kontrollierte Hüftbeugung in Rückenlage — Einsteiger in die Anti-Extension mit Fokus auf Atemtechnik.',
+    equipment: ['none', 'band'],
     variants: [
       {
         level: 'easy',
@@ -1775,8 +1717,10 @@ export const ALL_LEVELS = ['easy', 'medium', 'hard', 'maximum']
 
 // Select exercises: start with activation, then mix patterns
 // levels = array of level keys to include, e.g. ['hard', 'maximum']
-export function selectExercises(count, levels = ALL_LEVELS, extraExercises = []) {
-  const allExercises = [...EXERCISES, ...extraExercises]
+export function selectExercises(count, levels = ALL_LEVELS, extraExercises = [], availableEquipment = ['none']) {
+  const allExercises = [...EXERCISES, ...extraExercises].filter(ex =>
+    !ex.equipment || ex.equipment.some(e => availableEquipment.includes(e))
+  )
   const activation = allExercises.find(e => e.id === 'dead-bug') || allExercises[0]
   const rest = allExercises.filter(e => e.id !== activation.id)
   const shuffled = shuffle(rest)
@@ -1800,25 +1744,29 @@ export function selectExercises(count, levels = ALL_LEVELS, extraExercises = [])
     }
   }
 
-  const weightedEquip = ['dumbbell', 'cable']
+  const weightedEquip = ['dumbbell', 'cable', 'band']
   const usingWeighted = weightedEquip.some(e => availableEquipment.includes(e))
+  const effectiveLevels = usingWeighted ? [...levels, 'weighted'] : levels
 
-  // Filter variants to selected levels (preserve order)
   return selected.slice(0, count).map(ex => {
-    const filtered = ex.variants.filter(v => levels.includes(v.level))
-    // Weighted exercises: reduce to 1 variant (hardest available) — intensity via weight
-    if (usingWeighted && ex.equipment && ex.equipment.some(e => weightedEquip.includes(e))) {
+    const isWeightedEx = ex.equipment && ex.equipment.some(e => weightedEquip.includes(e))
+    if (usingWeighted && isWeightedEx) {
+      // Use the dedicated weighted variant if available, otherwise take hardest normal variant
+      const weightedVariant = ex.variants.find(v => v.level === 'weighted')
+      if (weightedVariant) return { ...ex, variants: [weightedVariant] }
       const order = ['maximum', 'hard', 'medium', 'easy']
-      const best = order.map(l => filtered.find(v => v.level === l)).find(Boolean)
-      return { ...ex, variants: best ? [best] : filtered.slice(0, 1) }
+      const best = order.map(l => ex.variants.find(v => v.level === l)).find(Boolean)
+      return { ...ex, variants: best ? [best] : ex.variants.slice(0, 1) }
     }
-    return { ...ex, variants: filtered }
+    return { ...ex, variants: ex.variants.filter(v => effectiveLevels.includes(v.level)) }
   })
 }
 
 // Single mode: each exercise gets exactly one variant (round-robin over selected levels)
-export function selectExercisesSingle(count, levels = ALL_LEVELS, extraExercises = []) {
-  const allExercises = [...EXERCISES, ...extraExercises]
+export function selectExercisesSingle(count, levels = ALL_LEVELS, extraExercises = [], availableEquipment = ['none']) {
+  const allExercises = [...EXERCISES, ...extraExercises].filter(ex =>
+    !ex.equipment || ex.equipment.some(e => availableEquipment.includes(e))
+  )
   const activation = allExercises.find(e => e.id === 'dead-bug') || allExercises[0]
   const rest = allExercises.filter(e => e.id !== activation.id)
   const shuffled = shuffle(rest)
@@ -1834,7 +1782,18 @@ export function selectExercisesSingle(count, levels = ALL_LEVELS, extraExercises
     if (!selected.find(s => s.id === ex.id)) selected.push(ex)
   }
 
+  const weightedEquip = ['dumbbell', 'cable', 'band']
+  const usingWeighted = weightedEquip.some(e => availableEquipment.includes(e))
+
   return selected.slice(0, count).map((ex, i) => {
+    const isWeightedEx = ex.equipment && ex.equipment.some(e => weightedEquip.includes(e))
+    if (usingWeighted && isWeightedEx) {
+      const weightedVariant = ex.variants.find(v => v.level === 'weighted')
+      if (weightedVariant) return { ...ex, variants: [weightedVariant] }
+      const order = ['maximum', 'hard', 'medium', 'easy']
+      const best = order.map(l => ex.variants.find(v => v.level === l)).find(Boolean)
+      return { ...ex, variants: best ? [best] : ex.variants.slice(0, 1) }
+    }
     const level = levels[i % levels.length]
     const variant = ex.variants.find(v => v.level === level) || ex.variants.find(v => levels.includes(v.level))
     return { ...ex, variants: variant ? [variant] : [] }
@@ -1847,6 +1806,9 @@ export function selectBurnout(levels = ALL_LEVELS) {
 }
 
 // Return exercises not in excludeIds (for swapping in preview)
-export function getSwapCandidates(excludeIds, extraExercises = []) {
-  return [...EXERCISES, ...extraExercises].filter(e => !excludeIds.includes(e.id))
+export function getSwapCandidates(excludeIds, extraExercises = [], availableEquipment = ['none']) {
+  return [...EXERCISES, ...extraExercises].filter(e =>
+    !excludeIds.includes(e.id) &&
+    (!e.equipment || e.equipment.some(eq => availableEquipment.includes(eq)))
+  )
 }

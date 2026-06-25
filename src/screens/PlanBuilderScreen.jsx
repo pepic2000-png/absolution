@@ -14,11 +14,6 @@ const LEVEL_LABELS = {
   easy: 'Leicht', medium: 'Mittel', hard: 'Schwer', maximum: 'Maximum', weighted: 'Gewicht',
 }
 
-const EQUIPMENT_LABELS = {
-  none: '🤸 BW', band: '🔴 Band', dumbbell: '🏋️ Hantel',
-  cable: '🔧 Seilzug', bar: '🏗️ Stange', bench: '🪑 Bank',
-}
-
 const PATTERN_LABELS = {
   'anti-extension': 'Anti-Extension',
   'anti-rotation':  'Anti-Rotation',
@@ -29,8 +24,16 @@ const PATTERN_LABELS = {
 }
 
 const PAUSE_OPTIONS = [5, 10, 15, 20, 30, 0]
+const DURATION_OPTIONS = [15, 20, 30, 45, 60]
 
-// Flatten exercises into individual variant entries
+function formatTotalTime(seconds) {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  if (m === 0) return `${s}s`
+  if (s === 0) return `${m} min`
+  return `${m}:${String(s).padStart(2, '0')} min`
+}
+
 function flattenExercises(exercises) {
   const items = []
   for (const ex of exercises) {
@@ -43,7 +46,6 @@ function flattenExercises(exercises) {
         equipment: ex.equipment,
         concept: ex.concept,
         variant,
-        // Keep full exercise for workout (single variant)
         exercise: { ...ex, variants: [variant] },
       })
     }
@@ -51,17 +53,32 @@ function flattenExercises(exercises) {
   return items
 }
 
+function getThumb(media, exerciseId, level) {
+  const key = `${exerciseId}__${level}`
+  const m = media?.[key] || media?.[`${exerciseId}__easy`]
+  const r = m?.sameAsEasy ? media?.[`${exerciseId}__easy`] : m
+  if (!r) return null
+  if (r.type === 'frames') return r.frames?.[0] || null
+  if (r.type === 'youtube') {
+    const match = r.url?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)
+    return match ? `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg` : null
+  }
+  return null
+}
+
 export default function PlanBuilderScreen({
   selectedLevels, config, onConfirm, onBack,
   extraExercises = [], onAddLocalExercise, onRemoveLocalExercise, localExercises = [],
-  globalExercises = [],
+  globalExercises = [], media = {},
 }) {
+  const defaultDuration = config?.variantDuration ?? 30
   const allExercises = [...EXERCISES, ...globalExercises, ...localExercises]
   const allItems = flattenExercises(allExercises)
 
   const defaultItem = allItems.find(i => i.exerciseId === 'dead-bug' && i.variant.level === 'easy') || allItems[0]
   const [selected, setSelected] = useState([defaultItem])
   const [pauses, setPauses] = useState([])
+  const [durations, setDurations] = useState([defaultDuration])
   const [planName, setPlanName] = useState('')
   const [filter, setFilter] = useState('all')
   const [showForm, setShowForm] = useState(false)
@@ -69,7 +86,10 @@ export default function PlanBuilderScreen({
   const selectedIds = selected.map(i => i.id)
   const patterns = ['all', ...Object.keys(PATTERN_LABELS)]
 
-  // Filter to only show levels matching selectedLevels (unless none match — then show all)
+  // Total workout time in seconds
+  const totalSeconds = durations.reduce((sum, d) => sum + d, 0)
+    + pauses.reduce((sum, p) => sum + (p ?? 0), 0)
+
   const filteredItems = allItems.filter(item => {
     if (filter !== 'all' && item.pattern !== filter) return false
     return true
@@ -85,9 +105,15 @@ export default function PlanBuilderScreen({
         next.splice(Math.max(0, idx - 1), 1)
         return next
       })
+      setDurations(prev => {
+        const next = [...prev]
+        next.splice(idx, 1)
+        return next
+      })
     } else {
       setSelected(prev => [...prev, item])
       setPauses(prev => [...prev, config?.pauseDuration ?? 15])
+      setDurations(prev => [...prev, defaultDuration])
     }
   }
 
@@ -100,16 +126,27 @@ export default function PlanBuilderScreen({
     })
   }
 
+  function cycleDuration(idx) {
+    setDurations(prev => {
+      const next = [...prev]
+      const pos = DURATION_OPTIONS.indexOf(next[idx])
+      next[idx] = DURATION_OPTIONS[(pos + 1) % DURATION_OPTIONS.length]
+      return next
+    })
+  }
+
   function moveUp(idx) {
     if (idx <= 1) return
     setSelected(prev => { const n = [...prev]; [n[idx-1], n[idx]] = [n[idx], n[idx-1]]; return n })
     setPauses(prev => { const n = [...prev]; [n[idx-2], n[idx-1]] = [n[idx-1], n[idx-2]]; return n })
+    setDurations(prev => { const n = [...prev]; [n[idx-1], n[idx]] = [n[idx], n[idx-1]]; return n })
   }
 
   function moveDown(idx) {
     if (idx === 0 || idx >= selected.length - 1) return
     setSelected(prev => { const n = [...prev]; [n[idx], n[idx+1]] = [n[idx+1], n[idx]]; return n })
     setPauses(prev => { if (idx-1 >= prev.length-1) return prev; const n=[...prev]; [n[idx-1],n[idx]]=[n[idx],n[idx-1]]; return n })
+    setDurations(prev => { const n = [...prev]; [n[idx], n[idx+1]] = [n[idx+1], n[idx]]; return n })
   }
 
   function handleAddLocalExercise(exercise) {
@@ -121,6 +158,7 @@ export default function PlanBuilderScreen({
     const exercises = selected.map((item, i) => ({
       ...item.exercise,
       pauseAfter: i < selected.length - 1 ? (pauses[i] ?? config?.pauseDuration ?? 15) : undefined,
+      variantDuration: durations[i] ?? defaultDuration,
     }))
     onConfirm(exercises, planName)
   }
@@ -134,7 +172,9 @@ export default function PlanBuilderScreen({
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 active:bg-gray-200 flex-shrink-0">←</button>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-gray-900">Eigener Plan</h1>
-          <p className="text-xs text-gray-400">{selected.length} Einheiten gewählt</p>
+          <p className="text-xs text-gray-400">
+            {selected.length} Übungen · <span className="font-semibold text-gray-500">⏱ {formatTotalTime(totalSeconds)}</span>
+          </p>
         </div>
         {onAddLocalExercise && !showForm && (
           <button onClick={() => setShowForm(true)}
@@ -161,7 +201,7 @@ export default function PlanBuilderScreen({
         </div>
       )}
 
-      {/* Selected order with pauses */}
+      {/* Selected order with durations and pauses */}
       {!showForm && selected.length > 0 && (
         <div className="px-5 mb-3 flex-shrink-0">
           <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 font-medium">Reihenfolge</div>
@@ -182,6 +222,12 @@ export default function PlanBuilderScreen({
                       <div className="font-bold truncate">{item.exerciseName}</div>
                       <div className="opacity-80">{LEVEL_LABELS[item.variant.level]}</div>
                     </div>
+                    {/* Duration button */}
+                    <button onClick={() => cycleDuration(idx)}
+                      className="flex flex-col items-center justify-center rounded-lg px-1.5 py-0.5 bg-gray-900 w-full"
+                      style={{ minWidth: '52px' }}>
+                      <span className="text-xs text-white font-bold">⏱ {durations[idx] ?? defaultDuration}s</span>
+                    </button>
                     {!(item.exerciseId === 'dead-bug' && selected.filter(s => s.exerciseId === 'dead-bug').length <= 1) && (
                       <button onClick={() => toggleItem(item)} className="text-red-400 text-xs">✕</button>
                     )}
@@ -226,35 +272,43 @@ export default function PlanBuilderScreen({
             const c = LEVEL_COLORS[item.variant.level] || LEVEL_COLORS.easy
             const isLocal = item.exerciseId?.startsWith('local-')
             const isGlobal = globalExercises.some(g => g.id === item.exerciseId)
+            const thumb = getThumb(media, item.exerciseId, item.variant.level)
             return (
-              <div key={item.id}
-                onClick={() => toggleItem(item)}
-                className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer select-none"
-                style={{
-                  backgroundColor: isSelected ? '#f0f0f0' : '#fafafa',
-                  border: `2px solid ${isSelected ? '#111' : 'transparent'}`,
-                  WebkitTapHighlightColor: 'transparent',
-                }}>
-                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
-                  style={{ backgroundColor: isSelected ? '#111' : '#e5e5e5', color: isSelected ? '#fff' : '#999' }}>
-                  {isSelected ? '✓' : '+'}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-semibold text-gray-900 text-sm">{item.exerciseName}</span>
-                    {isGlobal && <span className="text-xs bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full">🌐</span>}
-                    {isLocal && <span className="text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full">Eigene</span>}
+                  <div key={item.id}
+                    onClick={() => toggleItem(item)}
+                    className="rounded-2xl cursor-pointer select-none overflow-hidden"
+                    style={{
+                      backgroundColor: isSelected ? '#f0f0f0' : '#fafafa',
+                      border: `2px solid ${isSelected ? '#111' : 'transparent'}`,
+                      WebkitTapHighlightColor: 'transparent',
+                    }}>
+                    {thumb && (
+                      <div className="w-full h-24 overflow-hidden" style={{ backgroundColor: '#f5f5f5' }}>
+                        <img src={thumb} alt="" className="w-full h-full object-contain" />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 p-3">
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
+                        style={{ backgroundColor: isSelected ? '#111' : '#e5e5e5', color: isSelected ? '#fff' : '#999' }}>
+                        {isSelected ? '✓' : '+'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-semibold text-gray-900 text-sm">{item.exerciseName}</span>
+                          {isGlobal && <span className="text-xs bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full">🌐</span>}
+                          {isLocal && <span className="text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full">Eigene</span>}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-0.5 truncate">{item.variant.name}</div>
+                        <div className="text-xs text-gray-400 mt-0.5">{PATTERN_LABELS[item.pattern] || item.pattern}</div>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <span className="text-xs font-semibold px-2 py-1 rounded-lg"
+                          style={{ backgroundColor: c.bg, color: c.color }}>
+                          {LEVEL_LABELS[item.variant.level]}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-0.5 truncate">{item.variant.name}</div>
-                  <div className="text-xs text-gray-400 mt-0.5">{PATTERN_LABELS[item.pattern] || item.pattern}</div>
-                </div>
-                <div className="flex-shrink-0">
-                  <span className="text-xs font-semibold px-2 py-1 rounded-lg"
-                    style={{ backgroundColor: c.bg, color: c.color }}>
-                    {LEVEL_LABELS[item.variant.level]}
-                  </span>
-                </div>
-              </div>
             )
           })}
         </div>
@@ -266,7 +320,9 @@ export default function PlanBuilderScreen({
           style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}>
           <button onClick={handleConfirm} disabled={selected.length < 2}
             className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl active:opacity-90 disabled:opacity-40">
-            {selected.length < 2 ? 'Mind. 2 Einheiten wählen' : `Plan mit ${selected.length} Einheiten →`}
+            {selected.length < 2
+              ? 'Mind. 2 Einheiten wählen'
+              : `Plan starten · ${formatTotalTime(totalSeconds)} →`}
           </button>
         </div>
       )}
