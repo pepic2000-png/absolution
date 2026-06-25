@@ -224,9 +224,9 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
         <div className="flex items-center justify-between">
           <div>
             <div className="font-semibold text-gray-800">Übungen</div>
-            <div className="text-xs text-gray-400">2 – 15 (zufällig)</div>
+            <div className="text-xs text-gray-400">2 – 47 (zufällig)</div>
           </div>
-          <Stepper value={exerciseCount} min={2} max={15} onChange={setExerciseCount} />
+          <Stepper value={exerciseCount} min={2} max={47} onChange={setExerciseCount} />
         </div>
 
         <div>
