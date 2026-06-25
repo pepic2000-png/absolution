@@ -38,14 +38,15 @@ function CompactRingTimer({ seconds, total, color }) {
 export default function WorkoutScreen({
   exercise, exerciseIndex, totalExercises, config, muted, onFinish, media = {}
 }) {
+  const exDuration = exercise.variantDuration ?? config.variantDuration
   const [variantIdx, setVariantIdx] = useState(0)
-  const [seconds, setSeconds] = useState(config.variantDuration)
+  const [seconds, setSeconds] = useState(exDuration)
   const [paused, setPaused] = useState(false)
   const [isLandscape, setIsLandscape] = useState(
     () => window.matchMedia('(orientation: landscape)').matches
   )
   const pausedRef = useRef(false)
-  const secondsRef = useRef(config.variantDuration)
+  const secondsRef = useRef(exDuration)
   const variantIdxRef = useRef(0)
   const doneRef = useRef(false)
 
@@ -72,10 +73,10 @@ export default function WorkoutScreen({
     }
     variantIdxRef.current = nextIdx
     setVariantIdx(nextIdx)
-    secondsRef.current = config.variantDuration
-    setSeconds(config.variantDuration)
+    secondsRef.current = exDuration
+    setSeconds(exDuration)
     playSound(sounds.variantChange)
-  }, [variants.length, config.variantDuration, onFinish, muted])
+  }, [variants.length, exDuration, onFinish, muted])
 
   useEffect(() => {
     playSound(sounds.variantStart)
@@ -143,7 +144,7 @@ export default function WorkoutScreen({
 
       {/* Timer + current variant */}
       <div className="flex items-center gap-3 mb-2 flex-shrink-0">
-        <CompactRingTimer seconds={seconds} total={config.variantDuration} color={c.stroke} />
+        <CompactRingTimer seconds={seconds} total={exDuration} color={c.stroke} />
         <div className="flex-1 min-w-0">
           <div className="font-bold text-gray-900 text-sm leading-tight">{currentVariant?.name}</div>
           <div className="text-xs text-gray-500 mt-0.5 leading-snug line-clamp-3">{currentVariant?.desc}</div>

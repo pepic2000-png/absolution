@@ -14,11 +14,6 @@ const LEVEL_LABELS = {
   easy: 'Leicht', medium: 'Mittel', hard: 'Schwer', maximum: 'Maximum', weighted: 'Gewicht',
 }
 
-const EQUIPMENT_LABELS = {
-  none: '🤸 BW', band: '🔴 Band', dumbbell: '🏋️ Hantel',
-  cable: '🔧 Seilzug', bar: '🏗️ Stange', bench: '🪑 Bank',
-}
-
 const PATTERN_LABELS = {
   'anti-extension': 'Anti-Extension',
   'anti-rotation':  'Anti-Rotation',
@@ -29,8 +24,16 @@ const PATTERN_LABELS = {
 }
 
 const PAUSE_OPTIONS = [5, 10, 15, 20, 30, 0]
+const DURATION_OPTIONS = [15, 20, 30, 45, 60]
 
-// Flatten exercises into individual variant entries
+function formatTotalTime(seconds) {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  if (m === 0) return `${s}s`
+  if (s === 0) return `${m} min`
+  return `${m}:${String(s).padStart(2, '0')} min`
+}
+
 function flattenExercises(exercises) {
   const items = []
   for (const ex of exercises) {
@@ -43,7 +46,6 @@ function flattenExercises(exercises) {
         equipment: ex.equipment,
         concept: ex.concept,
         variant,
-        // Keep full exercise for workout (single variant)
         exercise: { ...ex, variants: [variant] },
       })
     }
@@ -56,12 +58,14 @@ export default function PlanBuilderScreen({
   extraExercises = [], onAddLocalExercise, onRemoveLocalExercise, localExercises = [],
   globalExercises = [],
 }) {
+  const defaultDuration = config?.variantDuration ?? 30
   const allExercises = [...EXERCISES, ...globalExercises, ...localExercises]
   const allItems = flattenExercises(allExercises)
 
   const defaultItem = allItems.find(i => i.exerciseId === 'dead-bug' && i.variant.level === 'easy') || allItems[0]
   const [selected, setSelected] = useState([defaultItem])
   const [pauses, setPauses] = useState([])
+  const [durations, setDurations] = useState([defaultDuration])
   const [planName, setPlanName] = useState('')
   const [filter, setFilter] = useState('all')
   const [showForm, setShowForm] = useState(false)
@@ -69,7 +73,10 @@ export default function PlanBuilderScreen({
   const selectedIds = selected.map(i => i.id)
   const patterns = ['all', ...Object.keys(PATTERN_LABELS)]
 
-  // Filter to only show levels matching selectedLevels (unless none match — then show all)
+  // Total workout time in seconds
+  const totalSeconds = durations.reduce((sum, d) => sum + d, 0)
+    + pauses.reduce((sum, p) => sum + (p ?? 0), 0)
+
   const filteredItems = allItems.filter(item => {
     if (filter !== 'all' && item.pattern !== filter) return false
     return true
@@ -85,9 +92,15 @@ export default function PlanBuilderScreen({
         next.splice(Math.max(0, idx - 1), 1)
         return next
       })
+      setDurations(prev => {
+        const next = [...prev]
+        next.splice(idx, 1)
+        return next
+      })
     } else {
       setSelected(prev => [...prev, item])
       setPauses(prev => [...prev, config?.pauseDuration ?? 15])
+      setDurations(prev => [...prev, defaultDuration])
     }
   }
 
@@ -100,16 +113,27 @@ export default function PlanBuilderScreen({
     })
   }
 
+  function cycleDuration(idx) {
+    setDurations(prev => {
+      const next = [...prev]
+      const pos = DURATION_OPTIONS.indexOf(next[idx])
+      next[idx] = DURATION_OPTIONS[(pos + 1) % DURATION_OPTIONS.length]
+      return next
+    })
+  }
+
   function moveUp(idx) {
     if (idx <= 1) return
     setSelected(prev => { const n = [...prev]; [n[idx-1], n[idx]] = [n[idx], n[idx-1]]; return n })
     setPauses(prev => { const n = [...prev]; [n[idx-2], n[idx-1]] = [n[idx-1], n[idx-2]]; return n })
+    setDurations(prev => { const n = [...prev]; [n[idx-1], n[idx]] = [n[idx], n[idx-1]]; return n })
   }
 
   function moveDown(idx) {
     if (idx === 0 || idx >= selected.length - 1) return
     setSelected(prev => { const n = [...prev]; [n[idx], n[idx+1]] = [n[idx+1], n[idx]]; return n })
     setPauses(prev => { if (idx-1 >= prev.length-1) return prev; const n=[...prev]; [n[idx-1],n[idx]]=[n[idx],n[idx-1]]; return n })
+    setDurations(prev => { const n = [...prev]; [n[idx], n[idx+1]] = [n[idx+1], n[idx]]; return n })
   }
 
   function handleAddLocalExercise(exercise) {
@@ -121,6 +145,7 @@ export default function PlanBuilderScreen({
     const exercises = selected.map((item, i) => ({
       ...item.exercise,
       pauseAfter: i < selected.length - 1 ? (pauses[i] ?? config?.pauseDuration ?? 15) : undefined,
+      variantDuration: durations[i] ?? defaultDuration,
     }))
     onConfirm(exercises, planName)
   }
@@ -134,7 +159,9 @@ export default function PlanBuilderScreen({
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 active:bg-gray-200 flex-shrink-0">←</button>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-gray-900">Eigener Plan</h1>
-          <p className="text-xs text-gray-400">{selected.length} Einheiten gewählt</p>
+          <p className="text-xs text-gray-400">
+            {selected.length} Übungen · <span className="font-semibold text-gray-500">⏱ {formatTotalTime(totalSeconds)}</span>
+          </p>
         </div>
         {onAddLocalExercise && !showForm && (
           <button onClick={() => setShowForm(true)}
@@ -161,7 +188,7 @@ export default function PlanBuilderScreen({
         </div>
       )}
 
-      {/* Selected order with pauses */}
+      {/* Selected order with durations and pauses */}
       {!showForm && selected.length > 0 && (
         <div className="px-5 mb-3 flex-shrink-0">
           <div className="text-xs text-gray-400 uppercase tracking-wider mb-2 font-medium">Reihenfolge</div>
@@ -182,6 +209,12 @@ export default function PlanBuilderScreen({
                       <div className="font-bold truncate">{item.exerciseName}</div>
                       <div className="opacity-80">{LEVEL_LABELS[item.variant.level]}</div>
                     </div>
+                    {/* Duration button */}
+                    <button onClick={() => cycleDuration(idx)}
+                      className="flex flex-col items-center justify-center rounded-lg px-1.5 py-0.5 bg-gray-900 w-full"
+                      style={{ minWidth: '52px' }}>
+                      <span className="text-xs text-white font-bold">⏱ {durations[idx] ?? defaultDuration}s</span>
+                    </button>
                     {!(item.exerciseId === 'dead-bug' && selected.filter(s => s.exerciseId === 'dead-bug').length <= 1) && (
                       <button onClick={() => toggleItem(item)} className="text-red-400 text-xs">✕</button>
                     )}
@@ -266,7 +299,9 @@ export default function PlanBuilderScreen({
           style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}>
           <button onClick={handleConfirm} disabled={selected.length < 2}
             className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl active:opacity-90 disabled:opacity-40">
-            {selected.length < 2 ? 'Mind. 2 Einheiten wählen' : `Plan mit ${selected.length} Einheiten →`}
+            {selected.length < 2
+              ? 'Mind. 2 Einheiten wählen'
+              : `Plan starten · ${formatTotalTime(totalSeconds)} →`}
           </button>
         </div>
       )}
