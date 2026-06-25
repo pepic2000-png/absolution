@@ -932,6 +932,7 @@ export const EXERCISES = [
     name: 'Seated Leg Lift',
     pattern: 'hip-flexion',
     concept: 'Hüftbeugekraft in aufrechter Sitzposition — Stabilisierung ohne Rückenlage.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -968,6 +969,7 @@ export const EXERCISES = [
     name: 'Plank Walk',
     pattern: 'bracing',
     concept: 'Dynamisches Bracing — der Rumpf stabilisiert während der Körper die Stützposition wechselt.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1004,6 +1006,7 @@ export const EXERCISES = [
     name: 'Oblique Crunch',
     pattern: 'lateral-flexion',
     concept: 'Direktes Training der seitlichen Bauchmuskulatur — laterale Flexion der Wirbelsäule.',
+    equipment: ['none', 'bar'],
     variants: [
       {
         level: 'easy',
@@ -1040,6 +1043,7 @@ export const EXERCISES = [
     name: 'Hollow to Arch',
     pattern: 'bracing',
     concept: 'Volle Körperspannung in beide Richtungen — Rumpf wechselt zwischen zwei Extrempositionen.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1076,6 +1080,7 @@ export const EXERCISES = [
     name: 'Half Kneeling Pallof',
     pattern: 'anti-rotation',
     concept: 'Anti-Rotation in instabiler Knieposition — höherer Transfer auf sportliche Bewegungen.',
+    equipment: ['cable', 'band'],
     variants: [
       {
         level: 'easy',
@@ -1112,6 +1117,7 @@ export const EXERCISES = [
     name: 'Swimmers (Prone)',
     pattern: 'bracing',
     concept: 'Posteriore Rumpfstabilisierung in Bauchlage — Gegenspieler zu den Beuge-dominierten Übungen.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1148,6 +1154,7 @@ export const EXERCISES = [
     name: 'Hip Thrust Isometric',
     pattern: 'bracing',
     concept: 'Statischer Hüftstoß — Gesäß und Rumpf halten die Hüfte auf maximaler Höhe.',
+    equipment: ['none', 'bench'],
     variants: [
       {
         level: 'easy',
@@ -1184,6 +1191,7 @@ export const EXERCISES = [
     name: 'Hanging Knee Raise',
     pattern: 'hip-flexion',
     concept: 'Hängende Hüftbeugung — volle Dekompression der Wirbelsäule kombiniert mit Kernkraft.',
+    equipment: ['bar'],
     variants: [
       {
         level: 'easy',
