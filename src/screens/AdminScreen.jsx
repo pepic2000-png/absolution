@@ -61,16 +61,17 @@ export default function AdminScreen({
     setPublishName('')
   }
 
-  async function handleSaveMedia() {
-    if (!editingMedia) return
+  async function handleSaveMedia(mediaKey) {
+    const key = mediaKey || editingMedia
+    if (!key) return
     if (mediaType === 'frames') {
       if (!frameUrl1.trim() || !frameUrl2.trim()) return
       setSaving(true)
-      await onSetMedia(editingMedia, frameUrl1.trim(), 'frames', [frameUrl1.trim(), frameUrl2.trim()])
+      await onSetMedia(key, frameUrl1.trim(), 'frames', [frameUrl1.trim(), frameUrl2.trim()])
     } else {
       if (!mediaUrl.trim()) return
       setSaving(true)
-      await onSetMedia(editingMedia, mediaUrl.trim(), mediaType)
+      await onSetMedia(key, mediaUrl.trim(), mediaType)
     }
     setSaving(false)
     setEditingMedia(null)
@@ -193,97 +194,135 @@ export default function AdminScreen({
 
         {/* VIDEOS TAB */}
         {tab === 'videos' && (
-          <div className="space-y-2">
-            <p className="text-xs text-gray-400 mb-3">YouTube-Link pro Übung. Alle Nutzer sehen das Video.</p>
+          <div className="space-y-3">
+            <p className="text-xs text-gray-400 mb-3">Bilder/Video pro Variante. Alle Nutzer sehen die Medien.</p>
             {allExercisesForVideo.map(ex => {
-              const m = media[ex.id]
-              const isEditing = editingMedia === ex.id
+              const levels = ['easy','medium','hard','maximum','weighted']
+              const exVariants = ex.variants?.filter(v => levels.includes(v.level)) || []
+              if (exVariants.length === 0) return null
               return (
-                <div key={ex.id}>
-                  <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-gray-800 text-sm">{ex.name}</div>
-                      {m ? (
-                        <div className="text-xs text-green-600 truncate">✓ Video vorhanden</div>
-                      ) : (
-                        <div className="text-xs text-gray-400">Kein Video</div>
-                      )}
-                    </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      {m && (
-                        <button onClick={() => onRemoveMedia(ex.id)}
-                          className="text-red-400 text-xs px-2 py-1 rounded-lg active:bg-red-50">✕</button>
-                      )}
-                      <button
-                        onClick={() => {
-                          setEditingMedia(isEditing ? null : ex.id)
-                          setMediaUrl(m?.url || '')
-                          setMediaType(m?.type || 'youtube')
-                          setFrameUrl1(m?.frames?.[0] || '')
-                          setFrameUrl2(m?.frames?.[1] || '')
-                        }}
-                        className="text-sm font-medium text-gray-700 bg-white border border-gray-200 px-3 py-1.5 rounded-xl active:bg-gray-50">
-                        {m ? 'Ändern' : '+ Video'}
-                      </button>
-                    </div>
+                <div key={ex.id} className="bg-gray-50 rounded-2xl overflow-hidden">
+                  <div className="px-4 py-2.5 border-b border-gray-100">
+                    <div className="font-semibold text-gray-800 text-sm">{ex.name}</div>
                   </div>
-                  {isEditing && (
-                    <div className="bg-white border border-gray-100 rounded-xl p-3 mt-1 shadow-sm space-y-2">
-                      <div className="flex gap-1.5">
-                        {[['youtube','▶ YouTube'],['video','🎬 Video'],['frames','🖼 Bilder']].map(([t, label]) => (
-                          <button key={t} onClick={() => setMediaType(t)}
-                            className="flex-1 py-1.5 rounded-lg text-xs font-semibold"
-                            style={{ backgroundColor: mediaType === t ? '#111' : '#f5f5f5', color: mediaType === t ? '#fff' : '#666' }}>
-                            {label}
-                          </button>
-                        ))}
-                      </div>
-                      {mediaType === 'frames' ? (
-                        <>
-                          {[['1', 'Startposition', frameUrl1, setFrameUrl1, fileInput1],
-                            ['2', 'Endposition',   frameUrl2, setFrameUrl2, fileInput2]].map(([slot, label, url, setUrl, inputRef]) => (
-                            <div key={slot} className="space-y-1">
-                              <div className="text-xs font-medium text-gray-500">{label}</div>
-                              <div className="flex gap-2">
-                                <input type="text" value={url} onChange={e => setUrl(e.target.value)}
-                                  placeholder="https://... oder Foto hochladen"
-                                  className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-gray-400 min-w-0" />
-                                <button onClick={() => inputRef.current?.click()}
-                                  className="flex-shrink-0 bg-gray-100 px-3 py-2 rounded-xl text-sm font-semibold active:bg-gray-200">
-                                  📁
-                                </button>
-                                <input ref={inputRef} type="file" accept="image/*" className="hidden"
-                                  onChange={e => handleFileSelect(e, Number(slot))} />
-                              </div>
-                              {uploadProgress[slot] !== undefined && (
-                                <div className="w-full bg-gray-100 rounded-full h-1.5">
-                                  <div className="bg-gray-900 h-1.5 rounded-full transition-all"
-                                    style={{ width: `${uploadProgress[slot]}%` }} />
-                                </div>
-                              )}
-                              {url && !uploadProgress[slot] && (
-                                <img src={url} alt={label} className="w-full h-24 object-cover rounded-xl" />
+                  <div className="divide-y divide-gray-100">
+                    {exVariants.map(v => {
+                      const mediaKey = `${ex.id}__${v.level}`
+                      const m = media[mediaKey]
+                      const isEditing = editingMedia === mediaKey
+                      const easyMedia = media[`${ex.id}__easy`]
+                      const LEVEL_LABELS = { easy:'Leicht', medium:'Mittel', hard:'Schwer', maximum:'Maximum', weighted:'Gewicht' }
+                      const LEVEL_COLORS = { easy:'#639922', medium:'#378ADD', hard:'#D85A30', maximum:'#7F77DD', weighted:'#7F77DD' }
+                      const col = LEVEL_COLORS[v.level] || '#666'
+                      return (
+                        <div key={v.level}>
+                          <div className="flex items-center gap-3 px-4 py-2.5">
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded-lg flex-shrink-0"
+                              style={{ backgroundColor: col + '18', color: col }}>
+                              {LEVEL_LABELS[v.level]}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              {m?.sameAsEasy ? (
+                                <div className="text-xs text-blue-500">↩ Gleich wie Leicht</div>
+                              ) : m ? (
+                                <div className="text-xs text-green-600">✓ {m.type === 'frames' ? 'Bilder' : m.type === 'youtube' ? 'YouTube' : 'Video'}</div>
+                              ) : (
+                                <div className="text-xs text-gray-400">Keine Medien</div>
                               )}
                             </div>
-                          ))}
-                        </>
-                      ) : (
-                        <>
-                          <input type="text" value={mediaUrl} onChange={e => setMediaUrl(e.target.value)}
-                            placeholder={mediaType === 'youtube' ? 'https://youtube.com/watch?v=...' : 'https://...mp4'}
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-gray-400" />
-                          {mediaType === 'youtube' && mediaUrl && getYouTubeId(mediaUrl) && (
-                            <div className="text-xs text-green-600">✓ YouTube-ID erkannt: {getYouTubeId(mediaUrl)}</div>
+                            <div className="flex gap-1.5 flex-shrink-0">
+                              {m && !m.sameAsEasy && (
+                                <button onClick={() => onRemoveMedia(mediaKey)}
+                                  className="text-red-400 text-xs px-2 py-1 rounded-lg active:bg-red-50">✕</button>
+                              )}
+                              <button
+                                onClick={() => {
+                                  setEditingMedia(isEditing ? null : mediaKey)
+                                  setMediaUrl(m?.url || '')
+                                  setMediaType(m?.type || 'frames')
+                                  setFrameUrl1(m?.frames?.[0] || '')
+                                  setFrameUrl2(m?.frames?.[1] || '')
+                                }}
+                                className="text-xs font-medium text-gray-700 bg-white border border-gray-200 px-2.5 py-1 rounded-lg active:bg-gray-50">
+                                {m ? 'Ändern' : '+ Medien'}
+                              </button>
+                            </div>
+                          </div>
+                          {isEditing && (
+                            <div className="bg-white border-t border-gray-100 p-3 space-y-2">
+                              {/* Same as easy checkbox — only for non-easy variants that have easy media */}
+                              {v.level !== 'easy' && easyMedia && !easyMedia.sameAsEasy && (
+                                <button
+                                  onClick={async () => {
+                                    setSaving(true)
+                                    await onSetMedia(mediaKey, '', 'sameAsEasy', null, true)
+                                    setSaving(false)
+                                    setEditingMedia(null)
+                                  }}
+                                  className="w-full flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2.5 text-sm text-blue-700 font-medium active:bg-blue-100">
+                                  <span className="text-base">☑</span>
+                                  Gleiche Bilder wie Leicht verwenden
+                                </button>
+                              )}
+                              <div className="flex gap-1.5">
+                                {[['youtube','▶ YouTube'],['video','🎬 Video'],['frames','🖼 Bilder']].map(([t, label]) => (
+                                  <button key={t} onClick={() => setMediaType(t)}
+                                    className="flex-1 py-1.5 rounded-lg text-xs font-semibold"
+                                    style={{ backgroundColor: mediaType === t ? '#111' : '#f5f5f5', color: mediaType === t ? '#fff' : '#666' }}>
+                                    {label}
+                                  </button>
+                                ))}
+                              </div>
+                              {mediaType === 'frames' ? (
+                                <>
+                                  {[['1', 'Startposition', frameUrl1, setFrameUrl1, fileInput1],
+                                    ['2', 'Endposition',   frameUrl2, setFrameUrl2, fileInput2]].map(([slot, label, url, setUrl, inputRef]) => (
+                                    <div key={slot} className="space-y-1">
+                                      <div className="text-xs font-medium text-gray-500">{label}</div>
+                                      <div className="flex gap-2">
+                                        <input type="text" value={url} onChange={e => setUrl(e.target.value)}
+                                          placeholder="https://... oder Foto hochladen"
+                                          className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-gray-400 min-w-0" />
+                                        <button onClick={() => inputRef.current?.click()}
+                                          className="flex-shrink-0 bg-gray-100 px-3 py-2 rounded-xl text-sm font-semibold active:bg-gray-200">
+                                          📁
+                                        </button>
+                                        <input ref={inputRef} type="file" accept="image/*" className="hidden"
+                                          onChange={e => handleFileSelect(e, Number(slot))} />
+                                      </div>
+                                      {uploadProgress[slot] !== undefined && (
+                                        <div className="w-full bg-gray-100 rounded-full h-1.5">
+                                          <div className="bg-gray-900 h-1.5 rounded-full transition-all"
+                                            style={{ width: `${uploadProgress[slot]}%` }} />
+                                        </div>
+                                      )}
+                                      {url && !uploadProgress[slot] && (
+                                        <img src={url} alt={label} className="w-full h-24 object-contain rounded-xl bg-gray-50" />
+                                      )}
+                                    </div>
+                                  ))}
+                                </>
+                              ) : (
+                                <>
+                                  <input type="text" value={mediaUrl} onChange={e => setMediaUrl(e.target.value)}
+                                    placeholder={mediaType === 'youtube' ? 'https://youtube.com/watch?v=...' : 'https://...mp4'}
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-gray-400" />
+                                  {mediaType === 'youtube' && mediaUrl && getYouTubeId(mediaUrl) && (
+                                    <div className="text-xs text-green-600">✓ YouTube-ID: {getYouTubeId(mediaUrl)}</div>
+                                  )}
+                                </>
+                              )}
+                              <button onClick={() => handleSaveMedia(mediaKey)}
+                                disabled={saving || (mediaType === 'frames' ? !frameUrl1.trim() || !frameUrl2.trim() : !mediaUrl.trim())}
+                                className="w-full bg-gray-900 text-white py-2.5 rounded-xl text-sm font-semibold disabled:opacity-40">
+                                {saving ? 'Speichern...' : 'Speichern'}
+                              </button>
+                            </div>
                           )}
-                        </>
-                      )}
-                      <button onClick={handleSaveMedia}
-                        disabled={saving || (mediaType === 'frames' ? !frameUrl1.trim() || !frameUrl2.trim() : !mediaUrl.trim())}
-                        className="w-full bg-gray-900 text-white py-2.5 rounded-xl text-sm font-semibold disabled:opacity-40">
-                        {saving ? 'Speichern...' : 'Speichern'}
-                      </button>
-                    </div>
-                  )}
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               )
             })}

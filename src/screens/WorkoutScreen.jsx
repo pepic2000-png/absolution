@@ -53,7 +53,9 @@ export default function WorkoutScreen({
   const variants = exercise.variants
   const currentVariant = variants[variantIdx]
   const c = VARIANT_COLORS[currentVariant?.level] || VARIANT_COLORS.easy
-  const exerciseMedia = media[exercise.id]
+  const variantKey = `${exercise.id}__${currentVariant?.level}`
+  const rawMedia = media[variantKey] || media[`${exercise.id}__easy`]
+  const exerciseMedia = rawMedia?.sameAsEasy ? media[`${exercise.id}__easy`] : rawMedia
   const ytId = exerciseMedia?.type === 'youtube' ? getYouTubeId(exerciseMedia.url) : null
   const isFrames = exerciseMedia?.type === 'frames' && exerciseMedia?.frames?.length >= 2
   const [frameIdx, setFrameIdx] = useState(0)
