@@ -12,6 +12,7 @@ html, body {
   padding: 0;
   overscroll-behavior: none;
   background: #fff;
+  color: #111;
 }
 
 #root {
@@ -22,7 +23,6 @@ html, body {
   bottom: 0;
   overflow: hidden;
   background: #fff;
-  color: #111;
 }
 
 .safe-top { padding-top: max(env(safe-area-inset-top), 16px); }
