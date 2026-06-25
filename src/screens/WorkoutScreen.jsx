@@ -172,7 +172,7 @@ export default function WorkoutScreen({
 
   return (
     <div className="bg-white screen-enter overflow-hidden"
-      style={{ height: '100dvh', display: 'flex', flexDirection: 'column' }}>
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
 
       {/* Progress bar */}
       <div className="h-1 bg-gray-100 flex-shrink-0" style={{ margin: '0' }}>

@@ -22,7 +22,7 @@ export default function DoneScreen({ exercises, config, burnoutDone, onReset }) 
     <div
       className="flex flex-col screen-enter"
       style={{
-        height: '100dvh',
+        height: '100%',
         paddingTop: 'max(24px, env(safe-area-inset-top))',
         paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
       }}

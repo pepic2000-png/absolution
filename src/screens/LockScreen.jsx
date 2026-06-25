@@ -25,7 +25,7 @@ export default function LockScreen({ onUnlock, onAdminUnlock }) {
   return (
     <div className="flex flex-col items-center justify-center bg-white"
       style={{
-        height: '100dvh',
+        height: '100%',
         paddingTop: 'max(24px, env(safe-area-inset-top))',
         paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
       }}
