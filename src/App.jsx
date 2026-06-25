@@ -129,7 +129,13 @@ export default function App() {
     if (isLast) {
       setScreen(config.burnoutEnabled && burnout ? S.BURNOUT : S.DONE)
     } else {
-      setScreen(S.PAUSE)
+      const pauseDur = exercise.pauseAfter ?? config.pauseDuration
+      if (pauseDur === 0) {
+        setCurrentExIdx(i => i + 1)
+        setScreen(S.WORKOUT)
+      } else {
+        setScreen(S.PAUSE)
+      }
     }
   }
 
@@ -232,7 +238,7 @@ export default function App() {
       )}
       {unlocked && screen === S.PAUSE && (
         <PauseScreen
-          duration={config.pauseDuration}
+          duration={exercises[currentExIdx]?.pauseAfter ?? config.pauseDuration}
           nextExercise={exercises[currentExIdx + 1]}
           config={config}
           muted={muted}
