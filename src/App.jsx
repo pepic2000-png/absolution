@@ -103,15 +103,8 @@ export default function App() {
 
   function handleBuilderConfirm(confirmedExercises, planName) {
     if (planName) savePlan(planName, confirmedExercises, config)
-    // In single mode, each exercise keeps only the variant matching its assigned level
-    const exs = config.workoutMode === 'single'
-      ? confirmedExercises.map((ex, i) => {
-          const level = config.selectedLevels[i % config.selectedLevels.length]
-          const variant = ex.variants.find(v => v.level === level) || ex.variants[0]
-          return { ...ex, variants: variant ? [variant] : ex.variants }
-        })
-      : confirmedExercises
-    setExercises(exs)
+    // Exercises from plan builder already have exactly 1 variant each
+    setExercises(confirmedExercises)
     setBurnout(config.burnoutEnabled ? selectBurnout(config.selectedLevels) : null)
     setScreen(S.PREVIEW)
   }
