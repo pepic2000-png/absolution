@@ -92,7 +92,7 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
     setVolume(v)
   }
 
-  const isWeighted = availableEquipment.some(e => ['dumbbell', 'cable'].includes(e))
+  const isWeighted = availableEquipment.some(e => ['dumbbell', 'cable', 'band'].includes(e))
   const variantCount = selectedLevels.length
 
   const equipmentFilteredCount = useMemo(() =>

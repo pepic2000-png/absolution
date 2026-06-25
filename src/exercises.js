@@ -1849,7 +1849,7 @@ export function selectExercises(count, levels = ALL_LEVELS, extraExercises = [],
     }
   }
 
-  const weightedEquip = ['dumbbell', 'cable']
+  const weightedEquip = ['dumbbell', 'cable', 'band']
   const usingWeighted = weightedEquip.some(e => availableEquipment.includes(e))
 
   // Filter variants to selected levels (preserve order)
