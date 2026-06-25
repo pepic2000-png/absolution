@@ -1800,11 +1800,20 @@ export function selectExercises(count, levels = ALL_LEVELS, extraExercises = [])
     }
   }
 
+  const weightedEquip = ['dumbbell', 'cable']
+  const usingWeighted = weightedEquip.some(e => availableEquipment.includes(e))
+
   // Filter variants to selected levels (preserve order)
-  return selected.slice(0, count).map(ex => ({
-    ...ex,
-    variants: ex.variants.filter(v => levels.includes(v.level)),
-  }))
+  return selected.slice(0, count).map(ex => {
+    const filtered = ex.variants.filter(v => levels.includes(v.level))
+    // Weighted exercises: reduce to 1 variant (hardest available) — intensity via weight
+    if (usingWeighted && ex.equipment && ex.equipment.some(e => weightedEquip.includes(e))) {
+      const order = ['maximum', 'hard', 'medium', 'easy']
+      const best = order.map(l => filtered.find(v => v.level === l)).find(Boolean)
+      return { ...ex, variants: best ? [best] : filtered.slice(0, 1) }
+    }
+    return { ...ex, variants: filtered }
+  })
 }
 
 // Single mode: each exercise gets exactly one variant (round-robin over selected levels)
