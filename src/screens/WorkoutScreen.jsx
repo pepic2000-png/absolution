@@ -205,10 +205,10 @@ export default function WorkoutScreen({
           {/* Content half */}
           <div className="flex flex-col bg-white overflow-y-auto"
             style={{
-              width: '340px',
+              width: 'min(420px, 42vw)',
               minWidth: '280px',
-              padding: '12px 16px',
-              paddingRight: 'max(16px, env(safe-area-inset-right))',
+              padding: '16px 20px',
+              paddingRight: 'max(20px, env(safe-area-inset-right))',
               paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
             }}>
             {infoPanel}
