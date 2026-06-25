@@ -115,6 +115,7 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
       style={{
         height: '100dvh',
         paddingTop: 'max(20px, env(safe-area-inset-top))',
+        paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
       {/* Header */}
@@ -319,8 +320,7 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
       </div>
 
       {/* CTAs */}
-      <div className="px-5 pt-3 flex flex-col gap-2 flex-shrink-0"
-        style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
+      <div className="px-5 pt-3 pb-4 flex flex-col gap-2 flex-shrink-0">
         <button onClick={handleStart} disabled={selectedLevels.length === 0}
           className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl active:opacity-90 disabled:opacity-40">
           {workoutMode === 'single' ? 'Quer-Workout starten →' : 'Varianten-Workout →'}
