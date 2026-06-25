@@ -280,28 +280,6 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
         </div>
 
         <div>
-          <div className="font-semibold text-gray-800 mb-2">Verfügbares Equipment</div>
-          <div className="flex flex-wrap gap-2">
-            {EQUIPMENT_OPTIONS.map(eq => {
-              const active = availableEquipment.includes(eq.key)
-              return (
-                <button key={eq.key} onClick={() => toggleEquipment(eq.key)}
-                  className="px-3 py-1.5 rounded-xl text-sm font-semibold transition-all"
-                  style={{
-                    backgroundColor: active ? '#111' : '#f5f5f5',
-                    color: active ? '#fff' : '#666',
-                  }}>
-                  {eq.label}
-                </button>
-              )
-            })}
-          </div>
-          <div className="text-xs text-gray-400 mt-1.5">
-            {equipmentFilteredCount} Übungen verfügbar
-          </div>
-        </div>
-
-        <div>
           <div className="flex items-center justify-between mb-2">
             <div className="font-semibold text-gray-800">Verfügbares Equipment</div>
             <button
