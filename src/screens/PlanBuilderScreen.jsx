@@ -53,10 +53,23 @@ function flattenExercises(exercises) {
   return items
 }
 
+function getThumb(media, exerciseId, level) {
+  const key = `${exerciseId}__${level}`
+  const m = media?.[key] || media?.[`${exerciseId}__easy`]
+  const r = m?.sameAsEasy ? media?.[`${exerciseId}__easy`] : m
+  if (!r) return null
+  if (r.type === 'frames') return r.frames?.[0] || null
+  if (r.type === 'youtube') {
+    const match = r.url?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)
+    return match ? `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg` : null
+  }
+  return null
+}
+
 export default function PlanBuilderScreen({
   selectedLevels, config, onConfirm, onBack,
   extraExercises = [], onAddLocalExercise, onRemoveLocalExercise, localExercises = [],
-  globalExercises = [],
+  globalExercises = [], media = {},
 }) {
   const defaultDuration = config?.variantDuration ?? 30
   const allExercises = [...EXERCISES, ...globalExercises, ...localExercises]
@@ -259,35 +272,43 @@ export default function PlanBuilderScreen({
             const c = LEVEL_COLORS[item.variant.level] || LEVEL_COLORS.easy
             const isLocal = item.exerciseId?.startsWith('local-')
             const isGlobal = globalExercises.some(g => g.id === item.exerciseId)
+            const thumb = getThumb(media, item.exerciseId, item.variant.level)
             return (
-              <div key={item.id}
-                onClick={() => toggleItem(item)}
-                className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer select-none"
-                style={{
-                  backgroundColor: isSelected ? '#f0f0f0' : '#fafafa',
-                  border: `2px solid ${isSelected ? '#111' : 'transparent'}`,
-                  WebkitTapHighlightColor: 'transparent',
-                }}>
-                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
-                  style={{ backgroundColor: isSelected ? '#111' : '#e5e5e5', color: isSelected ? '#fff' : '#999' }}>
-                  {isSelected ? '✓' : '+'}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-semibold text-gray-900 text-sm">{item.exerciseName}</span>
-                    {isGlobal && <span className="text-xs bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full">🌐</span>}
-                    {isLocal && <span className="text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full">Eigene</span>}
+                  <div key={item.id}
+                    onClick={() => toggleItem(item)}
+                    className="rounded-2xl cursor-pointer select-none overflow-hidden"
+                    style={{
+                      backgroundColor: isSelected ? '#f0f0f0' : '#fafafa',
+                      border: `2px solid ${isSelected ? '#111' : 'transparent'}`,
+                      WebkitTapHighlightColor: 'transparent',
+                    }}>
+                    {thumb && (
+                      <div className="w-full h-24 overflow-hidden" style={{ backgroundColor: '#f5f5f5' }}>
+                        <img src={thumb} alt="" className="w-full h-full object-contain" />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 p-3">
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
+                        style={{ backgroundColor: isSelected ? '#111' : '#e5e5e5', color: isSelected ? '#fff' : '#999' }}>
+                        {isSelected ? '✓' : '+'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-semibold text-gray-900 text-sm">{item.exerciseName}</span>
+                          {isGlobal && <span className="text-xs bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full">🌐</span>}
+                          {isLocal && <span className="text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full">Eigene</span>}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-0.5 truncate">{item.variant.name}</div>
+                        <div className="text-xs text-gray-400 mt-0.5">{PATTERN_LABELS[item.pattern] || item.pattern}</div>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <span className="text-xs font-semibold px-2 py-1 rounded-lg"
+                          style={{ backgroundColor: c.bg, color: c.color }}>
+                          {LEVEL_LABELS[item.variant.level]}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-0.5 truncate">{item.variant.name}</div>
-                  <div className="text-xs text-gray-400 mt-0.5">{PATTERN_LABELS[item.pattern] || item.pattern}</div>
-                </div>
-                <div className="flex-shrink-0">
-                  <span className="text-xs font-semibold px-2 py-1 rounded-lg"
-                    style={{ backgroundColor: c.bg, color: c.color }}>
-                    {LEVEL_LABELS[item.variant.level]}
-                  </span>
-                </div>
-              </div>
             )
           })}
         </div>

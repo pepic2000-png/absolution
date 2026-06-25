@@ -8,40 +8,47 @@ const LEVEL_COLORS = {
   maximum: { color: '#7F77DD', bg: '#f0eff9' },
 }
 
-function ExerciseRow({ ex, idx, isSwapping, onToggleSwap, onSwap, candidates, isFirst }) {
+function ExerciseRow({ ex, idx, isSwapping, onToggleSwap, onSwap, candidates, isFirst, thumb }) {
   return (
     <div>
-      {/* Exercise card — div not button to avoid iOS nested-button issue */}
       <div
         onClick={() => onToggleSwap(idx)}
-        className="w-full text-left bg-gray-50 rounded-2xl p-4 active:bg-gray-100 transition-colors cursor-pointer select-none"
+        className="w-full text-left bg-gray-50 rounded-2xl active:bg-gray-100 transition-colors cursor-pointer select-none overflow-hidden"
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-6 h-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                {idx + 1}
-              </span>
-              <span className="font-semibold text-gray-900">{ex.name}</span>
-              {isFirst && (
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Aktivierung</span>
-              )}
-            </div>
-            <p className="text-xs text-gray-500 pl-8 leading-snug">{ex.concept}</p>
-            <div className="flex gap-1 pl-8 mt-2 flex-wrap">
-              {ex.variants.map((v, vi) => {
-                const c = LEVEL_COLORS[v.level] || LEVEL_COLORS.easy
-                return (
-                  <span key={vi} className="text-xs px-2 py-0.5 rounded-full font-medium"
-                    style={{ backgroundColor: c.bg, color: c.color }}>
-                    {v.label}
-                  </span>
-                )
-              })}
-            </div>
+        {/* Thumbnail strip */}
+        {thumb && (
+          <div className="w-full h-28 bg-gray-100 overflow-hidden">
+            <img src={thumb} alt="" className="w-full h-full object-contain" style={{ backgroundColor: '#f5f5f5' }} />
           </div>
-          <span className={`text-lg mt-1 transition-transform ${isSwapping ? 'rotate-45 text-gray-600' : 'text-gray-300'}`}>⇄</span>
+        )}
+        <div className="p-4">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-6 h-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  {idx + 1}
+                </span>
+                <span className="font-semibold text-gray-900">{ex.name}</span>
+                {isFirst && (
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Aktivierung</span>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 pl-8 leading-snug">{ex.concept}</p>
+              <div className="flex gap-1 pl-8 mt-2 flex-wrap">
+                {ex.variants.map((v, vi) => {
+                  const c = LEVEL_COLORS[v.level] || LEVEL_COLORS.easy
+                  return (
+                    <span key={vi} className="text-xs px-2 py-0.5 rounded-full font-medium"
+                      style={{ backgroundColor: c.bg, color: c.color }}>
+                      {v.label}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+            <span className={`text-lg mt-1 transition-transform ${isSwapping ? 'rotate-45 text-gray-600' : 'text-gray-300'}`}>⇄</span>
+          </div>
         </div>
       </div>
 
@@ -74,7 +81,20 @@ function ExerciseRow({ ex, idx, isSwapping, onToggleSwap, onSwap, candidates, is
   )
 }
 
-export default function ExercisePreviewScreen({ exercises, selectedLevels, availableEquipment = ['none'], onConfirm, onBack, planName, onSavePlan, extraExercises = [] }) {
+function getThumb(media, exerciseId, level) {
+  const key = `${exerciseId}__${level}`
+  const m = media?.[key] || media?.[`${exerciseId}__easy`]
+  const r = m?.sameAsEasy ? media?.[`${exerciseId}__easy`] : m
+  if (!r) return null
+  if (r.type === 'frames') return r.frames?.[0] || null
+  if (r.type === 'youtube') {
+    const match = r.url?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)
+    return match ? `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg` : null
+  }
+  return null
+}
+
+export default function ExercisePreviewScreen({ exercises, selectedLevels, availableEquipment = ['none'], onConfirm, onBack, planName, onSavePlan, extraExercises = [], media = {} }) {
   const [list, setList] = useState(exercises)
   const [swappingIdx, setSwappingIdx] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -162,18 +182,23 @@ export default function ExercisePreviewScreen({ exercises, selectedLevels, avail
 
       {/* List */}
       <div className="flex-1 overflow-y-auto px-5 space-y-2 pb-2">
-        {list.map((ex, idx) => (
-          <ExerciseRow
-            key={`${ex.id}-${idx}`}
-            ex={ex}
-            idx={idx}
-            isSwapping={swappingIdx === idx}
-            onToggleSwap={toggleSwap}
-            onSwap={swapExercise}
-            candidates={candidatesForIdx(idx)}
-            isFirst={idx === 0}
-          />
-        ))}
+        {list.map((ex, idx) => {
+          const level = ex.variants?.[0]?.level
+          const thumb = getThumb(media, ex.id, level)
+          return (
+            <ExerciseRow
+              key={`${ex.id}-${idx}`}
+              ex={ex}
+              idx={idx}
+              isSwapping={swappingIdx === idx}
+              onToggleSwap={toggleSwap}
+              onSwap={swapExercise}
+              candidates={candidatesForIdx(idx)}
+              isFirst={idx === 0}
+              thumb={thumb}
+            />
+          )
+        })}
       </div>
 
       {/* CTA */}
