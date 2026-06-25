@@ -7,6 +7,7 @@ export const EXERCISES = [
     name: 'Dead Bug',
     pattern: 'anti-extension',
     concept: 'Trainiert die tiefe Stabilisation — Rücken bleibt flach, während Extremitäten sich bewegen.',
+    equipment: ['none', 'dumbbell', 'band'],
     variants: [
       {
         level: 'easy',
@@ -43,6 +44,7 @@ export const EXERCISES = [
     name: 'Plank Shoulder Tap',
     pattern: 'anti-rotation',
     concept: 'Erzwingt Rotationsstabilität — der Rumpf bleibt absolut still während ein Arm schwebt.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -79,6 +81,7 @@ export const EXERCISES = [
     name: 'Side Plank',
     pattern: 'lateral-flexion',
     concept: 'Isoliert die seitliche Rumpfkette — Quadratus lumborum und Obliques unter echter Last.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -115,6 +118,7 @@ export const EXERCISES = [
     name: 'Hollow Body Hold',
     pattern: 'anti-extension',
     concept: 'Die Grundform der Kernspannung — maximale Anti-Extension in der gesamten Körperlinie.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -151,6 +155,7 @@ export const EXERCISES = [
     name: 'Mountain Climber',
     pattern: 'hip-flexion',
     concept: 'Dynamische Hüftflexion unter Rumpfstabilisierung — Koordination trifft Kondition.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -187,6 +192,7 @@ export const EXERCISES = [
     name: 'Bicycle Crunch',
     pattern: 'rotation',
     concept: 'Rotationskraft mit Anti-Rotation — die Obliques arbeiten in ihrer natürlichen Funktion.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -223,6 +229,7 @@ export const EXERCISES = [
     name: 'Russian Twist',
     pattern: 'rotation',
     concept: 'Rotationsstärke unter Belastung — die Wirbelsäule dreht, der Rumpf kontrolliert.',
+    equipment: ['none', 'dumbbell'],
     variants: [
       {
         level: 'easy',
@@ -259,6 +266,7 @@ export const EXERCISES = [
     name: 'Reverse Crunch',
     pattern: 'hip-flexion',
     concept: 'Unteren Bauch und Hüftbeuger ansteuern — Becken bewegt sich, nicht die Beine.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -295,6 +303,7 @@ export const EXERCISES = [
     name: 'Leg Raise',
     pattern: 'hip-flexion',
     concept: 'Maximale Hüftbeugerkraft und untere Bauchmuskelkontrolle in der Absenkphase.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -331,6 +340,7 @@ export const EXERCISES = [
     name: 'Pallof Press',
     pattern: 'anti-rotation',
     concept: 'Anti-Rotationsübung par excellence — der Rumpf widersteht dem seitlichen Zug.',
+    equipment: ['cable', 'band'],
     variants: [
       {
         level: 'easy',
@@ -367,6 +377,7 @@ export const EXERCISES = [
     name: 'Ab Wheel Rollout',
     pattern: 'anti-extension',
     concept: 'Maximale Anti-Extension — das Rad erzwingt Stabilisierung über die gesamte Körperlänge.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -403,6 +414,7 @@ export const EXERCISES = [
     name: 'L-Sit Hold',
     pattern: 'hip-flexion',
     concept: 'Statische Hüftbeugerkraft kombiniert mit Druckkraft — komprimiert und stabilisiert.',
+    equipment: ['none', 'bar'],
     variants: [
       {
         level: 'easy',
@@ -439,6 +451,7 @@ export const EXERCISES = [
     name: 'Plank Hip Dip',
     pattern: 'lateral-flexion',
     concept: 'Seitliche Rumpfmuskulatur dynamisch — Plank als Basis für laterale Kontrolle.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -475,6 +488,7 @@ export const EXERCISES = [
     name: 'Bear Crawl Hold',
     pattern: 'bracing',
     concept: 'Quadrupede Stabilisierung — alle vier Punkte aktiv, Rumpf hält die Form unter Schwerkraft.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -511,6 +525,7 @@ export const EXERCISES = [
     name: 'V-Up',
     pattern: 'hip-flexion',
     concept: 'Explosiver Synchronisation von Ober- und Unterkörper — volle Rumpfkontraktion.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -547,6 +562,7 @@ export const EXERCISES = [
     name: 'Bird Dog',
     pattern: 'anti-extension',
     concept: 'Diagonale Verlängerung auf vier Punkten — Lendenwirbelsäule neutral unter Bewegungsanforderung.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -583,6 +599,7 @@ export const EXERCISES = [
     name: 'Suitcase Carry (Anti-Lateral)',
     pattern: 'lateral-flexion',
     concept: 'Seitliche Rumpfstabilisierung unter Last — Quadratus lumborum gegen echten Widerstand.',
+    equipment: ['dumbbell'],
     variants: [
       {
         level: 'easy',
@@ -619,6 +636,7 @@ export const EXERCISES = [
     name: 'Copenhagen Plank',
     pattern: 'lateral-flexion',
     concept: 'Adduktoren und seitliche Hüfte unter echter Belastung — oft vernachlässigt, extrem effektiv.',
+    equipment: ['bench'],
     variants: [
       {
         level: 'easy',
@@ -655,6 +673,7 @@ export const EXERCISES = [
     name: 'Stir the Pot',
     pattern: 'bracing',
     concept: 'Globale Rumpfstabilisierung unter Kreisbewegung — maximale Aktivierung bei minimaler Bewegung.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -691,6 +710,7 @@ export const EXERCISES = [
     name: 'Toe Taps',
     pattern: 'hip-flexion',
     concept: 'Niedrigintensive Hüftbeugung mit Rumpfkontrolle — gut als Einstieg oder Ergänzung.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -727,6 +747,7 @@ export const EXERCISES = [
     name: 'Windshield Wiper',
     pattern: 'rotation',
     concept: 'Kontrollierte Rotation mit langen Hebeln — Obliques gegen echten Widerstand durch Beingewicht.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -763,6 +784,7 @@ export const EXERCISES = [
     name: 'Glute Bridge March',
     pattern: 'bracing',
     concept: 'Posteriore Kette und Rumpf kombiniert — Becken stabil während Beine marschieren.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -799,6 +821,7 @@ export const EXERCISES = [
     name: 'Woodchop / Chop',
     pattern: 'rotation',
     concept: 'Diagonale Rotationskraft — ganzheitliche Aktivierung der rotatorischen Kette.',
+    equipment: ['cable', 'band', 'dumbbell'],
     variants: [
       {
         level: 'easy',
@@ -835,6 +858,7 @@ export const EXERCISES = [
     name: 'Dragon Flag',
     pattern: 'anti-extension',
     concept: 'Extreme Anti-Extension der gesamten Körperlinie — Schulterblätter als einziger Kontaktpunkt.',
+    equipment: ['bench', 'bar'],
     variants: [
       {
         level: 'easy',
@@ -871,6 +895,7 @@ export const EXERCISES = [
     name: 'Tuck Crunch',
     pattern: 'hip-flexion',
     concept: 'Kurze aber intensive Rumpfkontraktion — beide Enden gleichzeitig zur Mitte.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
