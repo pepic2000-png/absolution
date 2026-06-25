@@ -1,11 +1,21 @@
 import { useState, useMemo } from 'react'
 import { unlockAudio, setVolume, getVolume } from '../audio'
+import { EXERCISES } from '../exercises'
 
 const LEVELS = [
   { key: 'easy',    label: 'Leicht',  color: '#639922', bg: '#f0f7e6' },
   { key: 'medium',  label: 'Mittel',  color: '#378ADD', bg: '#e8f2fc' },
   { key: 'hard',    label: 'Schwer',  color: '#D85A30', bg: '#fdf0ea' },
   { key: 'maximum', label: 'Maximum', color: '#7F77DD', bg: '#f0eff9' },
+]
+
+const EQUIPMENT_OPTIONS = [
+  { key: 'none',     label: '🤸 Bodyweight' },
+  { key: 'band',     label: '🔴 Band' },
+  { key: 'dumbbell', label: '🏋️ Hantel' },
+  { key: 'cable',    label: '🔧 Seilzug' },
+  { key: 'bar',      label: '🏗️ Stange' },
+  { key: 'bench',    label: '🪑 Bank' },
 ]
 
 function formatTime(seconds) {
@@ -50,6 +60,7 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
   const [burnoutEnabled, setBurnoutEnabled] = useState(false)
   const [burnoutDuration, setBurnoutDuration] = useState(60)
   const [selectedLevels, setSelectedLevels] = useState(['easy', 'medium', 'hard'])
+  const [availableEquipment, setAvailableEquipment] = useState(['none'])
   const [vol, setVol] = useState(getVolume())
   const [showPlans, setShowPlans] = useState(false)
   const [showAdminModal, setShowAdminModal] = useState(false)
@@ -66,12 +77,26 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
     })
   }
 
+  function toggleEquipment(key) {
+    setAvailableEquipment(prev => {
+      if (prev.includes(key)) {
+        if (prev.length <= 1) return prev // always keep at least one
+        return prev.filter(k => k !== key)
+      }
+      return [...prev, key]
+    })
+  }
+
   function handleVolumeChange(v) {
     setVol(v)
     setVolume(v)
   }
 
   const variantCount = selectedLevels.length
+
+  const equipmentFilteredCount = useMemo(() =>
+    EXERCISES.filter(ex => !ex.equipment || ex.equipment.some(e => availableEquipment.includes(e))).length
+  , [availableEquipment])
 
   const summary = useMemo(() => {
     const effectiveVariants = workoutMode === 'single' ? 1 : variantCount
@@ -83,7 +108,7 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
   }, [workoutMode, exerciseCount, variantCount, variantDuration, pauseDuration, burnoutEnabled, burnoutDuration])
 
   function currentConfig() {
-    return { workoutMode, exerciseCount, variantDuration, pauseDuration, burnoutEnabled, burnoutDuration, selectedLevels }
+    return { workoutMode, exerciseCount, variantDuration, pauseDuration, burnoutEnabled, burnoutDuration, selectedLevels, availableEquipment }
   }
 
   function handleStart() {
@@ -251,6 +276,28 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
             {workoutMode === 'single'
               ? `${variantCount} Level${variantCount !== 1 ? 's' : ''} im Pool — je Übung 1 Level zugeteilt`
               : `${variantCount} Variante${variantCount !== 1 ? 'n' : ''} pro Übung`}
+          </div>
+        </div>
+
+        <div>
+          <div className="font-semibold text-gray-800 mb-2">Verfügbares Equipment</div>
+          <div className="flex flex-wrap gap-2">
+            {EQUIPMENT_OPTIONS.map(eq => {
+              const active = availableEquipment.includes(eq.key)
+              return (
+                <button key={eq.key} onClick={() => toggleEquipment(eq.key)}
+                  className="px-3 py-1.5 rounded-xl text-sm font-semibold transition-all"
+                  style={{
+                    backgroundColor: active ? '#111' : '#f5f5f5',
+                    color: active ? '#fff' : '#666',
+                  }}>
+                  {eq.label}
+                </button>
+              )
+            })}
+          </div>
+          <div className="text-xs text-gray-400 mt-1.5">
+            {equipmentFilteredCount} Übungen verfügbar
           </div>
         </div>
 

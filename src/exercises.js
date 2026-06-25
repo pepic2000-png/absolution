@@ -1228,6 +1228,7 @@ export const EXERCISES = [
     name: 'Plank Pull Through',
     pattern: 'anti-rotation',
     concept: 'Einseitige Last destabilisiert den Plank — Rumpf muss aktiv Rotation verhindern.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1264,6 +1265,7 @@ export const EXERCISES = [
     name: 'Crunch / Sit-up',
     pattern: 'hip-flexion',
     concept: 'Klassische Rumpfbeugung — kurze Kontraktionsbewegung der geraden Bauchmuskulatur.',
+    equipment: ['none', 'dumbbell'],
     variants: [
       {
         level: 'easy',
@@ -1300,6 +1302,7 @@ export const EXERCISES = [
     name: 'Flutter Kicks',
     pattern: 'hip-flexion',
     concept: 'Kontinuierliche Beinbewegung mit isometrisch gehaltener Rumpfspannung — Ausdauer trifft Kraft.',
+    equipment: ['none', 'bar'],
     variants: [
       {
         level: 'easy',
@@ -1336,6 +1339,7 @@ export const EXERCISES = [
     name: 'Heel Touches',
     pattern: 'lateral-flexion',
     concept: 'Seitliche Bauchmuskelaktivierung durch diagonale Streckbewegung — niedrig, aber präzise.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1372,6 +1376,7 @@ export const EXERCISES = [
     name: 'Standing Knee Raise',
     pattern: 'hip-flexion',
     concept: 'Stehende Hüftbeugung — Core-Kontrolle in aufrechter Position, Transfer auf Sport.',
+    equipment: ['none', 'bar'],
     variants: [
       {
         level: 'easy',
@@ -1408,6 +1413,7 @@ export const EXERCISES = [
     name: 'Jackknife',
     pattern: 'hip-flexion',
     concept: 'Gleichzeitige Kontraktion von Ober- und Unterkörper zur Mitte — maximale Rumpfsynergie.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1444,6 +1450,7 @@ export const EXERCISES = [
     name: 'V-Sit Progression',
     pattern: 'bracing',
     concept: 'Statische Hüftbeugung und Rumpfspannung kombiniert — der Körper bildet ein stabiles V.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1480,6 +1487,7 @@ export const EXERCISES = [
     name: 'Resistance Crunch',
     pattern: 'hip-flexion',
     concept: 'Crunch gegen externen Widerstand — höhere Kraftentwicklung durch Band oder Kabel.',
+    equipment: ['band', 'cable'],
     variants: [
       {
         level: 'easy',
@@ -1516,6 +1524,7 @@ export const EXERCISES = [
     name: 'RKC Plank',
     pattern: 'bracing',
     concept: 'Maximale Gesamtkörperspannung im Plank — alle Muskelgruppen gleichzeitig aktiviert.',
+    equipment: ['none', 'dumbbell'],
     variants: [
       {
         level: 'easy',
@@ -1552,6 +1561,7 @@ export const EXERCISES = [
     name: 'Star Side Plank',
     pattern: 'lateral-flexion',
     concept: 'Seitliche Rumpfstabilisierung in maximaler Ausladung — alle Extremitäten gestreckt.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1588,6 +1598,7 @@ export const EXERCISES = [
     name: 'Hanging Windshield Wiper',
     pattern: 'rotation',
     concept: 'Rotatorische Kraft am Reck — der Rumpf kontrolliert das Gewicht der Beine beim Pendeln.',
+    equipment: ['bar'],
     variants: [
       {
         level: 'easy',
@@ -1624,6 +1635,7 @@ export const EXERCISES = [
     name: 'Garhammer Raise',
     pattern: 'hip-flexion',
     concept: 'Hängende Hüftbeugung mit Hüftextension — maximale untere Bauchmuskelrekrutierung.',
+    equipment: ['bar'],
     variants: [
       {
         level: 'easy',
@@ -1660,6 +1672,7 @@ export const EXERCISES = [
     name: 'Plank Jack',
     pattern: 'bracing',
     concept: 'Dynamisches Bracing mit Beinbewegung — Rumpf stabilisiert während Beine springen.',
+    equipment: ['none'],
     variants: [
       {
         level: 'easy',
@@ -1696,6 +1709,7 @@ export const EXERCISES = [
     name: 'Supine March',
     pattern: 'anti-extension',
     concept: 'Kontrollierte Hüftbeugung in Rückenlage — Einsteiger in die Anti-Extension mit Fokus auf Atemtechnik.',
+    equipment: ['none', 'band'],
     variants: [
       {
         level: 'easy',
@@ -1808,8 +1822,10 @@ export const ALL_LEVELS = ['easy', 'medium', 'hard', 'maximum']
 
 // Select exercises: start with activation, then mix patterns
 // levels = array of level keys to include, e.g. ['hard', 'maximum']
-export function selectExercises(count, levels = ALL_LEVELS, extraExercises = []) {
-  const allExercises = [...EXERCISES, ...extraExercises]
+export function selectExercises(count, levels = ALL_LEVELS, extraExercises = [], availableEquipment = ['none']) {
+  const allExercises = [...EXERCISES, ...extraExercises].filter(ex =>
+    !ex.equipment || ex.equipment.some(e => availableEquipment.includes(e))
+  )
   const activation = allExercises.find(e => e.id === 'dead-bug') || allExercises[0]
   const rest = allExercises.filter(e => e.id !== activation.id)
   const shuffled = shuffle(rest)
@@ -1841,8 +1857,10 @@ export function selectExercises(count, levels = ALL_LEVELS, extraExercises = [])
 }
 
 // Single mode: each exercise gets exactly one variant (round-robin over selected levels)
-export function selectExercisesSingle(count, levels = ALL_LEVELS, extraExercises = []) {
-  const allExercises = [...EXERCISES, ...extraExercises]
+export function selectExercisesSingle(count, levels = ALL_LEVELS, extraExercises = [], availableEquipment = ['none']) {
+  const allExercises = [...EXERCISES, ...extraExercises].filter(ex =>
+    !ex.equipment || ex.equipment.some(e => availableEquipment.includes(e))
+  )
   const activation = allExercises.find(e => e.id === 'dead-bug') || allExercises[0]
   const rest = allExercises.filter(e => e.id !== activation.id)
   const shuffled = shuffle(rest)
@@ -1871,6 +1889,9 @@ export function selectBurnout(levels = ALL_LEVELS) {
 }
 
 // Return exercises not in excludeIds (for swapping in preview)
-export function getSwapCandidates(excludeIds, extraExercises = []) {
-  return [...EXERCISES, ...extraExercises].filter(e => !excludeIds.includes(e.id))
+export function getSwapCandidates(excludeIds, extraExercises = [], availableEquipment = ['none']) {
+  return [...EXERCISES, ...extraExercises].filter(e =>
+    !excludeIds.includes(e.id) &&
+    (!e.equipment || e.equipment.some(eq => availableEquipment.includes(eq)))
+  )
 }

@@ -9,6 +9,19 @@ const LEVEL_COLORS = {
   maximum: { color: '#7F77DD', bg: '#f0eff9' },
 }
 
+const EQUIPMENT_LABELS = {
+  none:     '🤸 BW',
+  band:     '🔴 Band',
+  dumbbell: '🏋️ Hantel',
+  cable:    '🔧 Seilzug',
+  bar:      '🏗️ Stange',
+  bench:    '🪑 Bank',
+}
+
+function equipLabel(key) {
+  return EQUIPMENT_LABELS[key] || key
+}
+
 const PATTERN_LABELS = {
   'anti-extension': 'Anti-Extension',
   'anti-rotation':  'Anti-Rotation',
@@ -207,6 +220,11 @@ export default function PlanBuilderScreen({
                     {isLocal && <span className="text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full">Eigene</span>}
                   </div>
                   <div className="text-xs text-gray-400 capitalize">{PATTERN_LABELS[ex.pattern] || ex.pattern}</div>
+                  <div className="flex gap-1 flex-wrap mt-0.5">
+                    {(ex.equipment || ['none']).map(e => (
+                      <span key={e} className="text-xs bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-full">{equipLabel(e)}</span>
+                    ))}
+                  </div>
                 </div>
                 {isLocal && onRemoveLocalExercise && (
                   <button

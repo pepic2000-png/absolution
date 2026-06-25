@@ -74,7 +74,7 @@ function ExerciseRow({ ex, idx, isSwapping, onToggleSwap, onSwap, candidates, is
   )
 }
 
-export default function ExercisePreviewScreen({ exercises, selectedLevels, onConfirm, onBack, planName, onSavePlan, extraExercises = [] }) {
+export default function ExercisePreviewScreen({ exercises, selectedLevels, availableEquipment = ['none'], onConfirm, onBack, planName, onSavePlan, extraExercises = [] }) {
   const [list, setList] = useState(exercises)
   const [swappingIdx, setSwappingIdx] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -99,7 +99,7 @@ export default function ExercisePreviewScreen({ exercises, selectedLevels, onCon
   // Candidates exclude all currently listed exercises
   const candidatesForIdx = (idx) => {
     const excludeIds = list.map(e => e.id)
-    return getSwapCandidates(excludeIds, extraExercises).map(c => ({
+    return getSwapCandidates(excludeIds, extraExercises, availableEquipment).map(c => ({
       ...c,
       variants: c.variants.filter(v => selectedLevels.includes(v.level)),
     }))

@@ -67,8 +67,8 @@ export default function App() {
 
   function handleSetupDone(cfg) {
     const exs = cfg.workoutMode === 'single'
-      ? selectExercisesSingle(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises)
-      : selectExercises(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises)
+      ? selectExercisesSingle(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises, cfg.availableEquipment)
+      : selectExercises(cfg.exerciseCount, cfg.selectedLevels, allExtraExercises, cfg.availableEquipment)
     const bo = cfg.burnoutEnabled ? selectBurnout(cfg.selectedLevels) : null
     setConfig(cfg)
     setExercises(exs)
@@ -184,6 +184,7 @@ export default function App() {
         <ExercisePreviewScreen
           exercises={exercises}
           selectedLevels={config.selectedLevels}
+          availableEquipment={config.availableEquipment || ['none']}
           onConfirm={handlePreviewConfirm}
           onBack={() => setScreen(S.SETUP)}
           onSavePlan={(name, exs) => savePlan(name, exs, config)}
