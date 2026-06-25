@@ -92,6 +92,7 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
     setVolume(v)
   }
 
+  const isWeighted = availableEquipment.some(e => ['dumbbell', 'cable'].includes(e))
   const variantCount = selectedLevels.length
 
   const equipmentFilteredCount = useMemo(() =>
@@ -254,30 +255,32 @@ export default function SetupScreen({ onStart, onOpenBuilder, onOpenAdmin, saved
           <Stepper value={exerciseCount} min={2} max={47} onChange={setExerciseCount} />
         </div>
 
-        <div>
-          <div className="font-semibold text-gray-800 mb-2">Schwierigkeits-Level</div>
-          <div className="grid grid-cols-4 gap-2">
-            {LEVELS.map(l => {
-              const active = selectedLevels.includes(l.key)
-              return (
-                <button key={l.key} onClick={() => toggleLevel(l.key)}
-                  className="py-2 rounded-xl text-sm font-semibold transition-all active:scale-95"
-                  style={{
-                    backgroundColor: active ? l.bg : '#f5f5f5',
-                    color: active ? l.color : '#aaa',
-                    border: `2px solid ${active ? l.color : 'transparent'}`,
-                  }}>
-                  {l.label}
-                </button>
-              )
-            })}
+        {!isWeighted && (
+          <div>
+            <div className="font-semibold text-gray-800 mb-2">Schwierigkeits-Level</div>
+            <div className="grid grid-cols-4 gap-2">
+              {LEVELS.map(l => {
+                const active = selectedLevels.includes(l.key)
+                return (
+                  <button key={l.key} onClick={() => toggleLevel(l.key)}
+                    className="py-2 rounded-xl text-sm font-semibold transition-all active:scale-95"
+                    style={{
+                      backgroundColor: active ? l.bg : '#f5f5f5',
+                      color: active ? l.color : '#aaa',
+                      border: `2px solid ${active ? l.color : 'transparent'}`,
+                    }}>
+                    {l.label}
+                  </button>
+                )
+              })}
+            </div>
+            <div className="text-xs text-gray-400 mt-1.5">
+              {workoutMode === 'single'
+                ? `${variantCount} Level${variantCount !== 1 ? 's' : ''} im Pool — je Übung 1 Level zugeteilt`
+                : `${variantCount} Variante${variantCount !== 1 ? 'n' : ''} pro Übung`}
+            </div>
           </div>
-          <div className="text-xs text-gray-400 mt-1.5">
-            {workoutMode === 'single'
-              ? `${variantCount} Level${variantCount !== 1 ? 's' : ''} im Pool — je Übung 1 Level zugeteilt`
-              : `${variantCount} Variante${variantCount !== 1 ? 'n' : ''} pro Übung`}
-          </div>
-        </div>
+        )}
 
         <div>
           <div className="flex items-center justify-between mb-2">
