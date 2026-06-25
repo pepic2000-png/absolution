@@ -127,7 +127,7 @@ export default function PlanBuilderScreen({
 
   return (
     <div className="flex flex-col bg-white screen-enter"
-      style={{ height: '100dvh', paddingTop: 'max(20px, env(safe-area-inset-top))', paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
+      style={{ height: '100%', paddingTop: 'max(20px, env(safe-area-inset-top))' }}>
 
       {/* Header */}
       <div className="px-5 mb-3 flex items-center gap-3 flex-shrink-0">
@@ -262,7 +262,8 @@ export default function PlanBuilderScreen({
 
       {/* CTA */}
       {!showForm && (
-        <div className="px-5 pt-3 flex-shrink-0">
+        <div className="px-5 pt-3 flex-shrink-0"
+          style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}>
           <button onClick={handleConfirm} disabled={selected.length < 2}
             className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl active:opacity-90 disabled:opacity-40">
             {selected.length < 2 ? 'Mind. 2 Einheiten wählen' : `Plan mit ${selected.length} Einheiten →`}

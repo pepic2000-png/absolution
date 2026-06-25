@@ -155,7 +155,7 @@ export default function App() {
   )
 
   return (
-    <div className="bg-white no-select" style={{ height: '100dvh', overflow: 'hidden' }}>
+    <div className="bg-white no-select" style={{ width: '100%', height: '100%' }}>
       {!unlocked && (
         <LockScreen onUnlock={() => {
           localStorage.setItem('corefit_unlocked', '1')

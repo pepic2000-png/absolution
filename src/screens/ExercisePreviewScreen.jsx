@@ -115,9 +115,8 @@ export default function ExercisePreviewScreen({ exercises, selectedLevels, avail
     <div
       className="flex flex-col bg-white screen-enter"
       style={{
-        height: '100dvh',
+        height: '100%',
         paddingTop: 'max(20px, env(safe-area-inset-top))',
-        paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
       }}
     >
       {/* Header */}
@@ -178,7 +177,7 @@ export default function ExercisePreviewScreen({ exercises, selectedLevels, avail
       </div>
 
       {/* CTA */}
-      <div className="px-5 pt-3 flex-shrink-0">
+      <div className="px-5 pt-3 flex-shrink-0" style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}>
         <button
           onClick={() => onConfirm(list)}
           className="w-full bg-gray-900 text-white font-bold text-lg py-4 rounded-2xl active:opacity-90"
