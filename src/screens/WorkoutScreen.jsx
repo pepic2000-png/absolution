@@ -105,12 +105,14 @@ export default function WorkoutScreen({
 
   // Media display
   const videoEmbed = isFrames ? (
-    <img
-      key={frameIdx}
-      src={exerciseMedia.frames[frameIdx]}
-      className="w-full h-full object-contain"
-      style={{ transition: 'opacity 0.15s ease' }}
-    />
+    <div className="w-full h-full relative">
+      {exerciseMedia.frames.map((src, i) => (
+        <img key={i} src={src} alt=""
+          className="absolute inset-0 w-full h-full object-contain"
+          style={{ opacity: i === frameIdx ? 1 : 0, transition: 'opacity 0.3s ease' }}
+        />
+      ))}
+    </div>
   ) : ytId ? (
     <iframe
       key={ytId}
@@ -199,8 +201,8 @@ export default function WorkoutScreen({
         /* ── LANDSCAPE: video left, content right ── */
         <div className="flex flex-1 min-h-0">
           {/* Video half */}
-          <div className="flex-1 bg-black relative flex items-center justify-center"
-            style={{ paddingLeft: 'env(safe-area-inset-left)' }}>
+          <div className="flex-1 relative flex items-center justify-center"
+            style={{ paddingLeft: 'env(safe-area-inset-left)', backgroundColor: isFrames ? '#f5f5f5' : '#000' }}>
             {videoEmbed ? (
               <div className="w-full h-full">{videoEmbed}</div>
             ) : (
@@ -236,8 +238,12 @@ export default function WorkoutScreen({
             paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
           }}>
           {/* Video block */}
-          <div className="bg-black flex-shrink-0 relative flex items-center justify-center"
-            style={{ aspectRatio: '16/9', maxHeight: '38vh' }}>
+          <div className="flex-shrink-0 relative flex items-center justify-center"
+            style={{
+              aspectRatio: '16/9',
+              maxHeight: '40vh',
+              backgroundColor: isFrames ? '#f5f5f5' : '#000',
+            }}>
             {videoEmbed ? (
               <div className="w-full h-full">{videoEmbed}</div>
             ) : (
