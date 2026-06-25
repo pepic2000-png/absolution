@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { sounds } from '../audio'
 
 const VARIANT_COLORS = {
@@ -55,6 +55,13 @@ export default function WorkoutScreen({
   const c = VARIANT_COLORS[currentVariant?.level] || VARIANT_COLORS.easy
   const exerciseMedia = media[exercise.id]
   const ytId = exerciseMedia?.type === 'youtube' ? getYouTubeId(exerciseMedia.url) : null
+  const isFrames = exerciseMedia?.type === 'frames' && exerciseMedia?.frames?.length >= 2
+  const [frameIdx, setFrameIdx] = useState(0)
+  useEffect(() => {
+    if (!isFrames) return
+    const t = setInterval(() => setFrameIdx(i => (i + 1) % exerciseMedia.frames.length), 900)
+    return () => clearInterval(t)
+  }, [isFrames, exerciseMedia?.frames?.length])
 
   useEffect(() => {
     const mq = window.matchMedia('(orientation: landscape)')
@@ -96,8 +103,15 @@ export default function WorkoutScreen({
 
   const progress = (exerciseIndex + variantIdx / variants.length) / totalExercises
 
-  // Video embed (always visible, muted autoplay loop for demo)
-  const videoEmbed = ytId ? (
+  // Media display
+  const videoEmbed = isFrames ? (
+    <img
+      key={frameIdx}
+      src={exerciseMedia.frames[frameIdx]}
+      className="w-full h-full object-contain"
+      style={{ transition: 'opacity 0.15s ease' }}
+    />
+  ) : ytId ? (
     <iframe
       key={ytId}
       src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&playsinline=1&controls=0&modestbranding=1&rel=0`}

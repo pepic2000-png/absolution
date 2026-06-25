@@ -14,6 +14,8 @@ export default function AdminScreen({
   const [editingMedia, setEditingMedia] = useState(null)
   const [mediaUrl, setMediaUrl] = useState('')
   const [mediaType, setMediaType] = useState('youtube')
+  const [frameUrl1, setFrameUrl1] = useState('')
+  const [frameUrl2, setFrameUrl2] = useState('')
   const [saving, setSaving] = useState(false)
   const [showExerciseForm, setShowExerciseForm] = useState(false)
 
@@ -27,12 +29,21 @@ export default function AdminScreen({
   }
 
   async function handleSaveMedia() {
-    if (!mediaUrl.trim() || !editingMedia) return
-    setSaving(true)
-    await onSetMedia(editingMedia, mediaUrl.trim(), mediaType)
+    if (!editingMedia) return
+    if (mediaType === 'frames') {
+      if (!frameUrl1.trim() || !frameUrl2.trim()) return
+      setSaving(true)
+      await onSetMedia(editingMedia, frameUrl1.trim(), 'frames', [frameUrl1.trim(), frameUrl2.trim()])
+    } else {
+      if (!mediaUrl.trim()) return
+      setSaving(true)
+      await onSetMedia(editingMedia, mediaUrl.trim(), mediaType)
+    }
     setSaving(false)
     setEditingMedia(null)
     setMediaUrl('')
+    setFrameUrl1('')
+    setFrameUrl2('')
   }
 
   async function handleAddGlobalExercise(exercise) {
@@ -174,6 +185,8 @@ export default function AdminScreen({
                           setEditingMedia(isEditing ? null : ex.id)
                           setMediaUrl(m?.url || '')
                           setMediaType(m?.type || 'youtube')
+                          setFrameUrl1(m?.frames?.[0] || '')
+                          setFrameUrl2(m?.frames?.[1] || '')
                         }}
                         className="text-sm font-medium text-gray-700 bg-white border border-gray-200 px-3 py-1.5 rounded-xl active:bg-gray-50">
                         {m ? 'Ändern' : '+ Video'}
@@ -182,22 +195,36 @@ export default function AdminScreen({
                   </div>
                   {isEditing && (
                     <div className="bg-white border border-gray-100 rounded-xl p-3 mt-1 shadow-sm space-y-2">
-                      <div className="flex gap-2">
-                        {['youtube', 'video'].map(t => (
+                      <div className="flex gap-1.5">
+                        {[['youtube','▶ YouTube'],['video','🎬 Video'],['frames','🖼 Bilder']].map(([t, label]) => (
                           <button key={t} onClick={() => setMediaType(t)}
                             className="flex-1 py-1.5 rounded-lg text-xs font-semibold"
                             style={{ backgroundColor: mediaType === t ? '#111' : '#f5f5f5', color: mediaType === t ? '#fff' : '#666' }}>
-                            {t === 'youtube' ? '▶ YouTube' : '🎬 Video-URL'}
+                            {label}
                           </button>
                         ))}
                       </div>
-                      <input type="text" value={mediaUrl} onChange={e => setMediaUrl(e.target.value)}
-                        placeholder={mediaType === 'youtube' ? 'https://youtube.com/watch?v=...' : 'https://...mp4'}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-gray-400" />
-                      {mediaType === 'youtube' && mediaUrl && getYouTubeId(mediaUrl) && (
-                        <div className="text-xs text-green-600">✓ YouTube-ID erkannt: {getYouTubeId(mediaUrl)}</div>
+                      {mediaType === 'frames' ? (
+                        <>
+                          <input type="text" value={frameUrl1} onChange={e => setFrameUrl1(e.target.value)}
+                            placeholder="URL Startposition (https://...jpg)"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-gray-400" />
+                          <input type="text" value={frameUrl2} onChange={e => setFrameUrl2(e.target.value)}
+                            placeholder="URL Endposition (https://...jpg)"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-gray-400" />
+                        </>
+                      ) : (
+                        <>
+                          <input type="text" value={mediaUrl} onChange={e => setMediaUrl(e.target.value)}
+                            placeholder={mediaType === 'youtube' ? 'https://youtube.com/watch?v=...' : 'https://...mp4'}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-gray-400" />
+                          {mediaType === 'youtube' && mediaUrl && getYouTubeId(mediaUrl) && (
+                            <div className="text-xs text-green-600">✓ YouTube-ID erkannt: {getYouTubeId(mediaUrl)}</div>
+                          )}
+                        </>
                       )}
-                      <button onClick={handleSaveMedia} disabled={saving || !mediaUrl.trim()}
+                      <button onClick={handleSaveMedia}
+                        disabled={saving || (mediaType === 'frames' ? !frameUrl1.trim() || !frameUrl2.trim() : !mediaUrl.trim())}
                         className="w-full bg-gray-900 text-white py-2.5 rounded-xl text-sm font-semibold disabled:opacity-40">
                         {saving ? 'Speichern...' : 'Speichern'}
                       </button>

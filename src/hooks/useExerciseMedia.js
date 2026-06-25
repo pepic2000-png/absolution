@@ -16,8 +16,10 @@ export default function useExerciseMedia() {
     return unsub
   }, [])
 
-  async function setExerciseMedia(exerciseId, url, type = 'youtube') {
-    await setDoc(doc(db, 'exerciseMedia', exerciseId), { url, type, updatedAt: new Date().toISOString() })
+  async function setExerciseMedia(exerciseId, url, type = 'youtube', frames = null) {
+    const data = { url, type, updatedAt: new Date().toISOString() }
+    if (frames) data.frames = frames
+    await setDoc(doc(db, 'exerciseMedia', exerciseId), data)
   }
 
   async function removeExerciseMedia(exerciseId) {
