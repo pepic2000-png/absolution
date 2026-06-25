@@ -15,7 +15,7 @@ html, body, #root {
 }
 
 body {
-  background: #000;
+  background: #fff;
   color: #111;
   margin: 0;
 }
@@ -23,7 +23,6 @@ body {
 #root {
   width: 100%;
   height: 100dvh;
-  background: #fff;
 }
 
 .safe-top { padding-top: max(env(safe-area-inset-top), 16px); }
