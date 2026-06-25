@@ -343,32 +343,11 @@ export const EXERCISES = [
     equipment: ['cable', 'band'],
     variants: [
       {
-        level: 'easy',
-        label: 'Leicht',
-        name: 'Pallof Press — Isometric Hold',
-        desc: 'Band oder Kabel seitlich, Hände vor der Brust halten. Position halten.',
-        cue: 'Schultern gerade — keine Drehung zur Seite erlaubt.',
-      },
-      {
-        level: 'medium',
-        label: 'Mittel',
-        name: 'Pallof Press — Presse',
-        desc: 'Hände zur Brust, dann Arme strecken und zurück. Kontrolliert.',
-        cue: 'Der Moment der Streckung ist der schwerste — dort kommt der Zug.',
-      },
-      {
-        level: 'hard',
-        label: 'Schwer',
-        name: 'Pallof Press — halb kniend',
-        desc: 'Knieender Stand, ein Knie vorne, Pallof Press ausführen.',
-        cue: 'Becken neutral — nicht zur Seite kippen wenn du drückst.',
-      },
-      {
-        level: 'maximum',
-        label: 'Maximum',
-        name: 'Pallof Press — stehend mit Rotation',
-        desc: 'Pallof Press, dann kontrolliert rotieren und zurück. Stehend.',
-        cue: 'Rotation ist erlaubt — aber sie muss kontrolliert sein, nicht passiv.',
+        level: 'weighted',
+        label: 'Ausführung',
+        name: 'Pallof Press',
+        desc: 'Band oder Kabel seitlich auf Brusthöhe. Hände zur Brust, Arme strecken und kontrolliert zurück. Stehend oder halbkniend.',
+        cue: 'Der Moment der Streckung ist der schwerste — Schultern gerade, keine Rotation.',
       },
     ],
   },
@@ -602,32 +581,11 @@ export const EXERCISES = [
     equipment: ['dumbbell'],
     variants: [
       {
-        level: 'easy',
-        label: 'Leicht',
-        name: 'Suitcase Hold — stehend',
-        desc: 'Gewicht einseitig halten (Hantel/Flasche), aufrecht stehen, 30 Sek pro Seite.',
+        level: 'weighted',
+        label: 'Ausführung',
+        name: 'Suitcase Carry',
+        desc: 'Hantel einseitig halten, aufrecht gehen. Seite nach Hälfte der Zeit wechseln. Gewicht: so schwer, dass der Rumpf arbeiten muss.',
         cue: 'Nicht zur Gewichtsseite kippen — genau das ist die Übung.',
-      },
-      {
-        level: 'medium',
-        label: 'Mittel',
-        name: 'Suitcase Walk — langsam',
-        desc: 'Einseitig Gewicht tragen, langsam im Raum bewegen. Aufrechte Haltung.',
-        cue: 'Schulter auf der Lastseite nicht hochziehen.',
-      },
-      {
-        level: 'hard',
-        label: 'Schwer',
-        name: 'Suitcase Walk — schweres Gewicht',
-        desc: 'Schweres einseitiges Gewicht, bewusstes Gegensteuern mit dem Rumpf.',
-        cue: 'Jeder Schritt ist eine Rumpfübung — nicht nur ein Spaziergang.',
-      },
-      {
-        level: 'maximum',
-        label: 'Maximum',
-        name: 'Overhead Carry — einseitig',
-        desc: 'Gewicht über Kopf auf einer Seite tragen. Maximale Stabilisierungsanforderung.',
-        cue: 'Arm aktiv nach oben drücken — nicht nur passive Last.',
       },
     ],
   },
@@ -824,32 +782,11 @@ export const EXERCISES = [
     equipment: ['cable', 'band', 'dumbbell'],
     variants: [
       {
-        level: 'easy',
-        label: 'Leicht',
-        name: 'Chop — kniend',
-        desc: 'Halbkniend, Hände zusammen, Diagonalbewegung von hoch-außen nach tief-innen.',
-        cue: 'Die Bewegung kommt aus den Hüften, nicht aus den Armen.',
-      },
-      {
-        level: 'medium',
-        label: 'Mittel',
-        name: 'Chop — stehend',
-        desc: 'Stehend, Gewicht oder Band, Diagonalbewegung hochzum tief.',
-        cue: 'Füße bleiben am Boden — Rotation über Hüfte und Wirbelsäule.',
-      },
-      {
-        level: 'hard',
-        label: 'Schwer',
-        name: 'Chop — Ausfallschritt',
-        desc: 'Chop Bewegung kombiniert mit Ausfallschritt in Rotationsrichtung.',
-        cue: 'Unterkörper und Oberkörper arbeiten zusammen.',
-      },
-      {
-        level: 'maximum',
-        label: 'Maximum',
-        name: 'Chop — explosiv',
-        desc: 'Explosiver Power Chop mit schnellem Zurückführen. Maximale Kraftentwicklung.',
-        cue: 'Explosiv rein, kontrolliert raus — nicht umgekehrt.',
+        level: 'weighted',
+        label: 'Ausführung',
+        name: 'Cable / Band Woodchop',
+        desc: 'Stehend, Kabel/Band/Hantel diagonal von hoch-außen nach tief-innen ziehen. Seite nach Hälfte wechseln. Bewegung aus Hüfte und Wirbelsäule.',
+        cue: 'Füße bleiben am Boden — Rotation kommt aus der Hüfte, nicht den Armen.',
       },
     ],
   },
@@ -1083,32 +1020,11 @@ export const EXERCISES = [
     equipment: ['cable', 'band'],
     variants: [
       {
-        level: 'easy',
-        label: 'Leicht',
-        name: 'Half Kneeling Hold',
-        desc: 'Halbkniend (ein Knie am Boden), Hände vor der Brust, seitlichem Zug widerstehen.',
-        cue: 'Knie und Hüfte in einer Linie — Becken neutral.',
-      },
-      {
-        level: 'medium',
-        label: 'Mittel',
-        name: 'Half Kneeling Press',
-        desc: 'Halbkniend, Arme strecken und zurückziehen gegen seitlichen Widerstand.',
-        cue: 'Das Strecken der Arme erhöht den Drehmoment — dort widerstehen.',
-      },
-      {
-        level: 'hard',
-        label: 'Schwer',
-        name: 'Half Kneeling Rotation',
-        desc: 'Halbkniend, kontrolliert rotieren und zurück. Bewegung mit Kontrolle.',
-        cue: 'Rotation ist jetzt erlaubt — aber kontrolliert und bewusst.',
-      },
-      {
-        level: 'maximum',
-        label: 'Maximum',
-        name: 'Half Kneeling — wechselndes Knie',
-        desc: 'Press + Knienwechsel ohne Widerstand zu verlieren.',
-        cue: 'Der Knienwechsel destabilisiert — genau dort maximal widerstehen.',
+        level: 'weighted',
+        label: 'Ausführung',
+        name: 'Half Kneeling Chop',
+        desc: 'Ein Knie am Boden, Kabel/Band seitlich. Arme strecken gegen den Zug und kontrolliert zurück. Seite nach Hälfte wechseln.',
+        cue: 'Becken neutral — das Strecken der Arme erhöht den Hebel, dort widerstehen.',
       },
     ],
   },
@@ -1490,32 +1406,11 @@ export const EXERCISES = [
     equipment: ['band', 'cable'],
     variants: [
       {
-        level: 'easy',
-        label: 'Leicht',
-        name: 'Standing Band Crunch',
-        desc: 'Stehend, Band hinter dem Kopf fixiert, Oberkörper nach unten crunchen.',
-        cue: 'Hüfte still — nur der Oberkörper bewegt sich nach unten.',
-      },
-      {
-        level: 'medium',
-        label: 'Mittel',
-        name: 'Band Crunch — kniend',
-        desc: 'Kniend, Band oder Kabel von oben, Ellenbogen zu den Oberschenkeln.',
-        cue: 'Band unter Spannung halten — kein Loslassen am Tiefpunkt.',
-      },
-      {
-        level: 'hard',
-        label: 'Schwer',
-        name: 'Cable Crunch',
-        desc: 'Am Kabelzug kniend, Seil hinter dem Kopf, Crunchen gegen Widerstand.',
-        cue: 'Hüfte als Drehpunkt — Bewegung kommt aus dem Bauch, nicht dem Rücken.',
-      },
-      {
-        level: 'maximum',
-        label: 'Maximum',
-        name: 'Cable Crunch — schwer',
-        desc: 'Maximales Gewicht am Kabelzug, langsame exzentrische Phase.',
-        cue: '3-4 Sekunden hochkontrolliert zurück — das ist die Schlüsselphase.',
+        level: 'weighted',
+        label: 'Ausführung',
+        name: 'Cable / Band Crunch',
+        desc: 'Kniend am Kabelzug oder mit Band von oben. Seil/Band hinter dem Kopf, Ellenbogen zu den Oberschenkeln crunchen. Langsam zurück.',
+        cue: 'Hüfte als Drehpunkt — 3 Sek kontrolliert zurück ist die Schlüsselphase.',
       },
     ],
   },
@@ -1851,17 +1746,19 @@ export function selectExercises(count, levels = ALL_LEVELS, extraExercises = [],
 
   const weightedEquip = ['dumbbell', 'cable', 'band']
   const usingWeighted = weightedEquip.some(e => availableEquipment.includes(e))
+  const effectiveLevels = usingWeighted ? [...levels, 'weighted'] : levels
 
-  // Filter variants to selected levels (preserve order)
   return selected.slice(0, count).map(ex => {
-    const filtered = ex.variants.filter(v => levels.includes(v.level))
-    // Weighted exercises: reduce to 1 variant (hardest available) — intensity via weight
-    if (usingWeighted && ex.equipment && ex.equipment.some(e => weightedEquip.includes(e))) {
+    const isWeightedEx = ex.equipment && ex.equipment.some(e => weightedEquip.includes(e))
+    if (usingWeighted && isWeightedEx) {
+      // Use the dedicated weighted variant if available, otherwise take hardest normal variant
+      const weightedVariant = ex.variants.find(v => v.level === 'weighted')
+      if (weightedVariant) return { ...ex, variants: [weightedVariant] }
       const order = ['maximum', 'hard', 'medium', 'easy']
-      const best = order.map(l => filtered.find(v => v.level === l)).find(Boolean)
-      return { ...ex, variants: best ? [best] : filtered.slice(0, 1) }
+      const best = order.map(l => ex.variants.find(v => v.level === l)).find(Boolean)
+      return { ...ex, variants: best ? [best] : ex.variants.slice(0, 1) }
     }
-    return { ...ex, variants: filtered }
+    return { ...ex, variants: ex.variants.filter(v => effectiveLevels.includes(v.level)) }
   })
 }
 
@@ -1885,7 +1782,18 @@ export function selectExercisesSingle(count, levels = ALL_LEVELS, extraExercises
     if (!selected.find(s => s.id === ex.id)) selected.push(ex)
   }
 
+  const weightedEquip = ['dumbbell', 'cable', 'band']
+  const usingWeighted = weightedEquip.some(e => availableEquipment.includes(e))
+
   return selected.slice(0, count).map((ex, i) => {
+    const isWeightedEx = ex.equipment && ex.equipment.some(e => weightedEquip.includes(e))
+    if (usingWeighted && isWeightedEx) {
+      const weightedVariant = ex.variants.find(v => v.level === 'weighted')
+      if (weightedVariant) return { ...ex, variants: [weightedVariant] }
+      const order = ['maximum', 'hard', 'medium', 'easy']
+      const best = order.map(l => ex.variants.find(v => v.level === l)).find(Boolean)
+      return { ...ex, variants: best ? [best] : ex.variants.slice(0, 1) }
+    }
     const level = levels[i % levels.length]
     const variant = ex.variants.find(v => v.level === level) || ex.variants.find(v => levels.includes(v.level))
     return { ...ex, variants: variant ? [variant] : [] }
